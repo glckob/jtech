@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J-Tech Cambodia - ហាងលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចពីជប៉ុន</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Khmer', sans-serif;
+            background-color: #f0f2f5;
+        }
+        h1, h2, h3, .font-koulen {
+            font-family: 'Koulen', cursive;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            animation: fadeIn 0.3s;
+        }
+        #productDetailModal .modal-content {
+            max-width: 800px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .product-card {
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+        }
+        #notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -10px);
+        }
+        .hero-banner {
+            background: linear-gradient(to right, #0052D4, #65C7F7, #9CECFB);
+        }
+        .thumbnail {
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .thumbnail.active {
+            border-color: #2563eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-2xl md:text-3xl text-blue-600 font-koulen">J-TECH CAMBODIA</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        <span class="font-semibold text-gray-700">097 244 4424 / 096 717 212</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="adminLoginBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Admin</button>
+                    <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">ផ្ទាំងបញ្ជា</button>
+                    <button id="logoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">ចាកចេញ</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- Hero Banner -->
+        <section class="hero-banner text-white rounded-lg shadow-lg p-8 md:p-12 mb-8 flex items-center">
+            <div class="w-full md:w-1/2">
+                <h2 class="text-3xl md:text-5xl font-koulen mb-4">ផលិតផលគុណភាពពីជប៉ុន</h2>
+                <p class="mb-6">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
+                <a href="#productGrid" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition duration-300">មើលផលិតផលទាំងអស់</a>
+            </div>
+            <div class="hidden md:block w-1/2 text-center">
+                 <img src="https://placehold.co/400x300/ffffff/0052D4?text=J-TECH" alt="J-Tech Product" class="mx-auto rounded-lg">
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-8">
+            <h3 class="text-xl font-koulen mb-4">ស្វែងរកផលិតផល</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <input id="searchInput" type="text" placeholder="វាយឈ្មោះទំនិញ..." class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <select id="categoryFilter" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">គ្រប់ប្រភេទ</option>
+                </select>
+                <select id="brandFilter" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">គ្រប់ម៉ាក</option>
+                </select>
+                <select id="priceFilter" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">គ្រប់តម្លៃ</option>
+                    <option value="<100">ក្រោម $100</option>
+                    <option value="100-300">$100 - $300</option>
+                    <option value=">300">លើស $300</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Product cards will be inserted here by JavaScript -->
+        </div>
+        <div id="noProductsMessage" class="hidden text-center text-gray-500 mt-10">
+            <p class="text-xl">មិនមានផលិតផលដែលត្រូវនឹងការស្វែងរករបស់អ្នកទេ។</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="font-koulen text-2xl mb-4">J-TECH CAMBODIA</h3>
+                    <p class="text-gray-400">នាំចូល និងចែកចាយផលិតផល IT មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
+                     <p class="text-gray-300 mt-4 flex items-start space-x-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                        <span>ផ្លូវលំទី៣ នៃផ្លូវ 371 ក្បែរផ្សារ 2002</span>
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-koulen text-xl mb-4">ទំនាក់ទំនង</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center space-x-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2.153a1 1 0 01-.986-.836l-.74-4.435a1 1 0 01.54-1.06l1.548-.773a11.037 11.037 0 00-6.105-6.105l-.774 1.548a1 1 0 01-1.06.54l-4.435-.74A1 1 0 012 4.153V3z" /></svg>
+                            <span>097 244 4424 / 096 717 212</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
+                            <a href="https://t.me/lazytospeak" target="_blank" class="hover:text-blue-400 transition">Telegram Channel</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-koulen text-xl mb-4">តាមដានពួកយើង</h3>
+                     <a href="https://www.facebook.com/J-TECH-Cambodia" target="_blank" class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clip-rule="evenodd" /></svg>
+                        <span>J-TECH Cambodia</span>
+                    </a>
+                    <div class="mt-4">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3909.020419348274!2d104.8881680147858!3d11.54283179179975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310951fac4884c99%3A0x8321a50c60d96356!2sJ-TECH%20Cambodia!5e0!3m2!1sen!2skh" width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="rounded-lg"></iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-4 text-center text-gray-500 text-sm">
+                <p>&copy; 2024 J-TECH CAMBODIA. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+
+    <!-- Admin Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-koulen mb-4 text-center">ចូលក្នុងគណនី Admin</h2>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700">អ៊ីមែល</label>
+                    <input type="email" id="loginEmail" class="w-full p-2 border rounded-lg" required>
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700">ពាក្យសម្ងាត់</label>
+                    <input type="password" id="loginPassword" class="w-full p-2 border rounded-lg" required>
+                </div>
+                <p id="loginError" class="text-red-500 text-sm mb-4"></p>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" id="closeLoginModal" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg">បោះបង់</button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">ចូល</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content max-w-4xl">
+            <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រងផលិតផល</h2>
+            
+            <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
+                <h3 id="formTitle" class="text-xl font-koulen mb-4">បន្ថែម/កែប្រែផលិតផល</h3>
+                <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="hidden" id="productId">
+                    <div>
+                        <label class="block text-gray-700">ឈ្មោះផលិតផល</label>
+                        <input type="text" id="productName" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">ម៉ាក</label>
+                        <input type="text" id="productBrand" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                     <div>
+                        <label class="block text-gray-700">ប្រភេទ</label>
+                        <select id="productCategory" class="w-full p-2 border rounded-lg" required>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">តម្លៃ ($)</label>
+                        <input type="number" id="productPrice" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700">ការពិពណ៌នា</label>
+                        <textarea id="productDescription" rows="3" class="w-full p-2 border rounded-lg"></textarea>
+                    </div>
+                    
+                    <!-- Multiple Image URLs -->
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 mb-2">URL រូបភាព (រហូតដល់ ១០)</label>
+                        <div id="imageUrlsContainer" class="space-y-2">
+                            <!-- Image URL inputs will be added here -->
+                        </div>
+                        <button type="button" id="addImageUrlBtn" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded-lg">បន្ថែម URL</button>
+                    </div>
+
+                    <div class="md:col-span-2 flex justify-end space-x-3">
+                        <button type="button" id="cancelEditBtn" class="hidden bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg">បោះបង់ការកែប្រែ</button>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">រក្សាទុក</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
+                <h3 class="text-xl font-koulen mb-4">គ្រប់គ្រងប្រភេទ</h3>
+                <form id="categoryForm" class="flex items-center gap-4 mb-4">
+                    <input type="text" id="newCategoryName" placeholder="ឈ្មោះប្រភេទថ្មី..." class="flex-grow p-2 border rounded-lg" required>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">បន្ថែម</button>
+                </form>
+                <div id="categoryList" class="space-y-2"></div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" id="closeAdminModal" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">បិទផ្ទាំងបញ្ជា</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Image Gallery -->
+                <div>
+                    <img id="mainImage" src="" alt="Product Image" class="w-full h-80 object-cover rounded-lg mb-4">
+                    <div id="thumbnailContainer" class="grid grid-cols-5 gap-2">
+                        <!-- Thumbnails will be generated here -->
+                    </div>
+                </div>
+                <!-- Product Info -->
+                <div>
+                    <h2 id="detailName" class="text-3xl font-koulen mb-2"></h2>
+                    <p id="detailBrand" class="text-lg text-gray-500 mb-4"></p>
+                    <p id="detailPrice" class="text-3xl font-bold text-blue-600 mb-4"></p>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-gray-800">ប្រភេទ:</h4>
+                        <p id="detailCategory" class="text-gray-600"></p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-800">ការពិពណ៌នា:</h4>
+                        <p id="detailDescription" class="text-gray-600 whitespace-pre-wrap"></p>
+                    </div>
+                </div>
+            </div>
+            <button id="closeDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+        </div>
+    </div>
+
+
+    <!-- Notification Element -->
+    <div id="notification"></div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut,
+            signInAnonymously,
+            signInWithCustomToken
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getDatabase,
+            ref,
+            onValue,
+            set,
+            push,
+            remove,
+            update
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPxdjrcDZYGGHAZ2av3M2gjXSzdsAvXC4",
+            authDomain: "j-tech-web-1b237.firebaseapp.com",
+            databaseURL: "https://j-tech-web-1b237-default-rtdb.firebaseio.com",
+            projectId: "j-tech-web-1b237",
+            storageBucket: "j-tech-web-1b237.appspot.com",
+            messagingSenderId: "589738658753",
+            appId: "1:589738658753:web:0b73c4b786196238b163a7" 
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // --- DOM Elements ---
+        const notification = document.getElementById('notification');
+        const productGrid = document.getElementById('productGrid');
+        const noProductsMessage = document.getElementById('noProductsMessage');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const brandFilter = document.getElementById('brandFilter');
+        const priceFilter = document.getElementById('priceFilter');
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminPanelBtn = document.getElementById('adminPanelBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        // Modals
+        const loginModal = document.getElementById('loginModal');
+        const adminModal = document.getElementById('adminModal');
+        const productDetailModal = document.getElementById('productDetailModal');
+        // Modal Close Buttons
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeAdminModal = document.getElementById('closeAdminModal');
+        const closeDetailModal = document.getElementById('closeDetailModal');
+        // Forms
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const productForm = document.getElementById('productForm');
+        const categoryForm = document.getElementById('categoryForm');
+        const newCategoryName = document.getElementById('newCategoryName');
+        const categoryList = document.getElementById('categoryList');
+        const formTitle = document.getElementById('formTitle');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        // New Elements
+        const imageUrlsContainer = document.getElementById('imageUrlsContainer');
+        const addImageUrlBtn = document.getElementById('addImageUrlBtn');
+
+        // --- Global State ---
+        let allProducts = [];
+        let allCategories = [];
+        let currentUser = null;
+        let editingProductId = null;
+
+        // --- Helper Functions ---
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.style.backgroundColor = isError ? '#ef4444' : '#22c55e';
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user && !user.isAnonymous) {
+                adminLoginBtn.classList.add('hidden');
+                adminPanelBtn.classList.remove('hidden');
+                logoutBtn.classList.remove('hidden');
+            } else {
+                adminLoginBtn.classList.remove('hidden');
+                adminPanelBtn.classList.add('hidden');
+                logoutBtn.classList.add('hidden');
+            }
+            renderProducts(filterProducts());
+        });
+
+        async function initializeAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) { console.error("Authentication failed:", error); }
+        }
+
+        // --- Realtime Database Data Fetching ---
+        const productsRef = ref(db, 'products');
+        const categoriesRef = ref(db, 'categories');
+
+        onValue(productsRef, (snapshot) => {
+            const data = snapshot.val();
+            allProducts = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            renderProducts(filterProducts());
+            populateFilters();
+        }, (error) => {
+            console.error("Firebase read failed (products): ", error);
+            showNotification("មិនអាចអានទិន្នន័យផលិតផលបានទេ។ សូមពិនិត្យ Database Rules។", true);
+        });
+
+        onValue(categoriesRef, (snapshot) => {
+            const data = snapshot.val();
+            allCategories = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            populateCategorySelects();
+            renderCategoryList();
+        }, (error) => {
+            console.error("Firebase read failed (categories): ", error);
+            showNotification("មិនអាចអានទិន្នន័យប្រភេទបានទេ។ សូមពិនិត្យ Database Rules។", true);
+        });
+
+        // --- Rendering and Filtering ---
+        function renderProducts(products) {
+            productGrid.innerHTML = '';
+            noProductsMessage.classList.toggle('hidden', products.length > 0);
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
+                card.dataset.id = product.id; // Add product ID to the card for click event
+
+                const mainImage = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) 
+                    ? product.imageUrls[0] 
+                    : 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
+
+                card.innerHTML = `
+                    <img src="${mainImage}" alt="${product.name}" class="w-full h-48 object-cover">
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h3 class="text-lg font-bold text-gray-800 truncate">${product.name}</h3>
+                        <p class="text-sm text-gray-500">${product.brand}</p>
+                        <p class="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 self-start my-2">${product.category || 'N/A'}</p>
+                        <div class="flex-grow"></div>
+                        <div class="flex justify-between items-center mt-4">
+                            <p class="text-xl font-koulen text-blue-600">$${product.price}</p>
+                            ${(currentUser && !currentUser.isAnonymous) ? `
+                            <div class="flex space-x-2">
+                                <button data-id="${product.id}" class="edit-btn bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center">✏️</button>
+                                <button data-id="${product.id}" class="delete-btn bg-red-500 hover:bg-red-600 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center">🗑️</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                productGrid.appendChild(card);
+            });
+
+            // Add event listeners
+            document.querySelectorAll('.product-card').forEach(card => card.addEventListener('click', handleProductClick));
+            document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEditProduct));
+            document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteProduct));
+        }
+
+        function filterProducts() {
+            // ... (filtering logic is the same)
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value;
+            const brand = brandFilter.value;
+            const price = priceFilter.value;
+
+            return allProducts.filter(p => {
+                const nameMatch = p.name.toLowerCase().includes(searchTerm);
+                const brandMatch = p.brand.toLowerCase().includes(searchTerm);
+                const descriptionMatch = p.description ? p.description.toLowerCase().includes(searchTerm) : true;
+                const categoryMatch = category ? p.category === category : true;
+                const brandFilterMatch = brand ? p.brand === brand : true;
+                
+                const priceMatch = (() => {
+                    if (!p.price) return price === '';
+                    switch (price) {
+                        case '<100': return p.price < 100;
+                        case '100-300': return p.price >= 100 && p.price <= 300;
+                        case '>300': return p.price > 300;
+                        default: return true;
+                    }
+                })();
+
+                return (nameMatch || brandMatch || descriptionMatch) && categoryMatch && brandFilterMatch && priceMatch;
+            });
+        }
+        
+        function populateFilters() {
+            // ... (filter population logic is the same)
+            const brands = [...new Set(allProducts.map(p => p.brand))];
+            brandFilter.innerHTML = '<option value="">គ្រប់ម៉ាក</option>';
+            brands.sort().forEach(brand => {
+                brandFilter.innerHTML += `<option value="${brand}">${brand}</option>`;
+            });
+        }
+
+        function populateCategorySelects() {
+            // ... (category population logic is the same)
+             const optionsHTML = allCategories
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(cat => `<option value="${cat.name}">${cat.name}</option>`)
+                .join('');
+            
+            categoryFilter.innerHTML = '<option value="">គ្រប់ប្រភេទ</option>' + optionsHTML;
+            document.getElementById('productCategory').innerHTML = optionsHTML;
+        }
+
+        function renderCategoryList() {
+            // ... (category list rendering is the same)
+            categoryList.innerHTML = '';
+            allCategories
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .forEach(cat => {
+                    const el = document.createElement('div');
+                    el.className = 'flex justify-between items-center bg-white p-2 rounded-lg';
+                    el.innerHTML = `
+                        <span>${cat.name}</span>
+                        <button data-id="${cat.id}" class="delete-category-btn text-red-500 hover:text-red-700">🗑️</button>
+                    `;
+                    categoryList.appendChild(el);
+                });
+            
+            document.querySelectorAll('.delete-category-btn').forEach(btn => {
+                btn.addEventListener('click', handleDeleteCategory);
+            });
+        }
+
+        function applyFilters() { renderProducts(filterProducts()); }
+
+        // --- Modal & Form Logic ---
+
+        // Event Listeners for Modals
+        adminLoginBtn.addEventListener('click', () => { loginModal.style.display = 'flex'; });
+        closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
+        adminPanelBtn.addEventListener('click', () => { adminModal.style.display = 'flex'; resetProductForm(); });
+        closeAdminModal.addEventListener('click', () => { adminModal.style.display = 'none'; });
+        closeDetailModal.addEventListener('click', () => { productDetailModal.style.display = 'none'; });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.style.display = 'none';
+            if (e.target === adminModal) adminModal.style.display = 'none';
+            if (e.target === productDetailModal) productDetailModal.style.display = 'none';
+        });
+
+        // Product Detail Modal Logic
+        function handleProductClick(e) {
+            // Prevent opening detail modal if an admin button was clicked
+            if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) {
+                return;
+            }
+            const productId = e.currentTarget.dataset.id;
+            showProductDetails(productId);
+        }
+
+        function showProductDetails(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            // Populate text content
+            document.getElementById('detailName').textContent = product.name;
+            document.getElementById('detailBrand').textContent = product.brand;
+            document.getElementById('detailPrice').textContent = `$${product.price}`;
+            document.getElementById('detailCategory').textContent = product.category;
+            document.getElementById('detailDescription').textContent = product.description;
+
+            // Populate image gallery
+            const mainImageEl = document.getElementById('mainImage');
+            const thumbnailContainer = document.getElementById('thumbnailContainer');
+            thumbnailContainer.innerHTML = '';
+
+            const images = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) 
+                ? product.imageUrls 
+                : [];
+            
+            if (images.length > 0) {
+                mainImageEl.src = images[0];
+                images.forEach((url, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = url;
+                    thumb.className = 'thumbnail w-full h-16 object-cover rounded';
+                    if (index === 0) thumb.classList.add('active');
+                    thumb.addEventListener('click', () => {
+                        mainImageEl.src = url;
+                        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                        thumb.classList.add('active');
+                    });
+                    thumbnailContainer.appendChild(thumb);
+                });
+            } else {
+                 mainImageEl.src = 'https://placehold.co/800x600/e2e8f0/64748b?text=No+Image';
+            }
+
+            productDetailModal.style.display = 'flex';
+        }
+
+
+        // Admin Actions
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.textContent = '';
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                loginModal.style.display = 'none';
+                loginForm.reset();
+            } catch (error) {
+                console.error("Login failed:", error.message);
+                loginError.textContent = 'អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។';
+            }
+        });
+        
+        logoutBtn.addEventListener('click', async () => {
+            try { await signOut(auth); await initializeAuth(); } 
+            catch (error) { console.error("Logout failed:", error); }
+        });
+
+        // Multiple Image URL Logic
+        addImageUrlBtn.addEventListener('click', () => {
+            if (imageUrlsContainer.children.length < 10) {
+                addUrlInput();
+            } else {
+                showNotification("អាចបន្ថែមរូបភាពបានត្រឹមតែ ១០ ប៉ុណ្ណោះ។", true);
+            }
+        });
+
+        function addUrlInput(value = '') {
+            const div = document.createElement('div');
+            div.className = 'flex items-center space-x-2';
+            div.innerHTML = `
+                <input type="text" class="image-url-input w-full p-2 border rounded-lg" placeholder="https://..." value="${value}">
+                <button type="button" class="remove-url-btn bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">X</button>
+            `;
+            div.querySelector('.remove-url-btn').addEventListener('click', () => div.remove());
+            imageUrlsContainer.appendChild(div);
+        }
+
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const imageUrls = Array.from(document.querySelectorAll('.image-url-input'))
+                                   .map(input => input.value.trim())
+                                   .filter(url => url); // Filter out empty strings
+
+            if (imageUrls.length === 0) {
+                showNotification("សូមបញ្ចូល URL រូបភាពយ៉ាងតិចមួយ។", true);
+                return;
+            }
+
+            const productData = {
+                name: document.getElementById('productName').value,
+                brand: document.getElementById('productBrand').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                description: document.getElementById('productDescription').value,
+                imageUrls: imageUrls
+            };
+
+            try {
+                if (editingProductId) {
+                    const productRef = ref(db, `products/${editingProductId}`);
+                    await update(productRef, productData);
+                    showNotification('កែប្រែផលិតផលបានជោគជ័យ!');
+                } else {
+                    const newProductRef = push(productsRef);
+                    await set(newProductRef, productData);
+                    showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
+                }
+                resetProductForm();
+                adminModal.style.display = 'none';
+            } catch (error) {
+                console.error("Error saving product:", error);
+                showNotification('មានបញ្ហាក្នុងការរក្សាទុកផលិតផល។', true);
+            }
+        });
+
+        categoryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = newCategoryName.value.trim();
+            if (name) {
+                try {
+                    const newCategoryRef = push(categoriesRef);
+                    await set(newCategoryRef, { name });
+                    showNotification(`បានបន្ថែមប្រភេទ "${name}"`);
+                    newCategoryName.value = '';
+                } catch (error) {
+                    console.error("Error adding category: ", error);
+                    showNotification('មានបញ្ហាក្នុងការបន្ថែមប្រភេទ។', true);
+                }
+            }
+        });
+
+        function handleEditProduct(e) {
+            e.stopPropagation(); // Prevent card click event from firing
+            editingProductId = e.target.closest('button').dataset.id;
+            const product = allProducts.find(p => p.id === editingProductId);
+            if (product) {
+                resetProductForm(); // Clear previous state
+                document.getElementById('productId').value = product.id;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productBrand').value = product.brand;
+                document.getElementById('productCategory').value = product.category;
+                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productDescription').value = product.description;
+
+                if (Array.isArray(product.imageUrls)) {
+                    product.imageUrls.forEach(url => addUrlInput(url));
+                }
+
+                formTitle.textContent = 'កែប្រែផលិតផល';
+                cancelEditBtn.classList.remove('hidden');
+                adminModal.style.display = 'flex';
+                productForm.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        async function handleDeleteProduct(e) {
+            e.stopPropagation(); // Prevent card click event from firing
+            const id = e.target.closest('button').dataset.id;
+            if (confirm('តើអ្នកពិតជាចង់លុបផលិតផលនេះមែនទេ?')) {
+                try {
+                    await remove(ref(db, `products/${id}`));
+                    showNotification('ផលិតផលត្រូវបានលុប។', true);
+                } catch (error) {
+                    console.error("Error deleting product:", error);
+                    showNotification('មានបញ្ហាក្នុងការលុបផលិតផល។', true);
+                }
+            }
+        }
+
+        async function handleDeleteCategory(e) {
+            const id = e.target.closest('button').dataset.id;
+            if (confirm('តើអ្នកពិតជាចង់លុបប្រភេទនេះមែនទេ?')) {
+                try {
+                    await remove(ref(db, `categories/${id}`));
+                    showNotification('ប្រភេទត្រូវបានលុប។', true);
+                } catch (error) {
+                    console.error("Error deleting category:", error);
+                    showNotification('មានបញ្ហាក្នុងការលុបប្រភេទ។', true);
+                }
+            }
+        }
+        
+        function resetProductForm() {
+            productForm.reset();
+            imageUrlsContainer.innerHTML = ''; // Clear all image URL inputs
+            addUrlInput(); // Add one empty input to start
+            editingProductId = null;
+            formTitle.textContent = 'បន្ថែម/កែប្រែផលិតផល';
+            cancelEditBtn.classList.add('hidden');
+        }
+
+        cancelEditBtn.addEventListener('click', resetProductForm);
+
+        // --- Initial Load ---
+        async function main() {
+            await initializeAuth();
+            resetProductForm();
+        }
+
+        main();
+
+    </script>
+</body>
+</html>
