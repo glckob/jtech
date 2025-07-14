@@ -123,7 +123,7 @@
         
         <section class="hero-banner text-white rounded-lg shadow-lg p-6 md:p-8 mb-8 flex items-center">
             <div class="w-full md:w-2/3">
-                <h2 class="text-2xl md:text-4xl font-koulen mb-3">J-TECH Cambodia ផលិតផលគុណភាពពីជប៉ុន</h2>
+                <h2 class="text-2xl md:text-4xl font-koulen mb-3">J-TECH CAMBODIA ផលិតផលគុណភាពពីជប៉ុន</h2>
                 <p class="mb-5 text-sm md:text-base">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
                     <a href="#productGrid" class="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg hover:bg-gray-200 transition duration-300 text-sm">មើលផលិតផលទាំងអស់</a>
@@ -143,7 +143,7 @@
         <div class="bg-white p-4 rounded-lg shadow-md mb-8">
             <h3 class="text-xl font-koulen mb-4">ស្វែងរកផលិតផល</h3>
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-                <input id="searchInput" type="text" placeholder="វាយឈ្មោះទំនិញ..." class="col-span-2 lg:col-span-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <input id="searchInput" type="text" placeholder="វាយឈ្មោះ ឬលេខកូដ..." class="col-span-2 lg:col-span-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <select id="categoryFilter" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">គ្រប់ប្រភេទ</option>
                 </select>
@@ -180,7 +180,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <h3 class="font-koulen text-2xl mb-4">J-TECH CAMBODIA</h3>
-                    <p class="text-gray-400">នាំចូល និងចែកចាយផលិតផល មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
+                    <p class="text-gray-400">នាំចូល និងចែកចាយផលិតផល IT មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
                      <p class="text-gray-300 mt-4 flex items-start space-x-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                         <span>ផ្លូវលំទី៣ នៃផ្លូវ 371 ក្បែរផ្សារ 2002</span>
@@ -261,6 +261,10 @@
                 <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="hidden" id="productId">
                     <div>
+                        <label class="block text-gray-700">លេខកូដផលិតផល</label>
+                        <input type="text" id="productCode" class="w-full p-2 border rounded-lg bg-gray-200" readonly>
+                    </div>
+                    <div>
                         <label class="block text-gray-700">ឈ្មោះផលិតផល</label>
                         <input type="text" id="productName" class="w-full p-2 border rounded-lg" required>
                     </div>
@@ -280,16 +284,17 @@
                         <label class="block text-gray-700">ចំនួននាំចូល</label>
                         <input type="number" id="productImportQty" class="w-full p-2 border rounded-lg" value="1" required>
                     </div>
-                    <div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700">ការពិពណ៌នា</label>
+                        <textarea id="productDescription" rows="3" class="w-full p-2 border rounded-lg"></textarea>
+                    </div>
+                    
+                    <div class="md:col-span-2">
                         <label class="block text-gray-700">ស្ថានភាព</label>
                         <select id="productStatus" class="w-full p-2 border rounded-lg" required>
                             <option value="inStock">មានក្នុងស្តុក</option>
                             <option value="soldOut">អស់ពីស្តុក</option>
                         </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-gray-700">ការពិពណ៌នា</label>
-                        <textarea id="productDescription" rows="3" class="w-full p-2 border rounded-lg"></textarea>
                     </div>
 
                     <div class="md:col-span-2">
@@ -334,6 +339,7 @@
                 </div>
                 <div>
                     <h2 id="detailName" class="text-3xl font-koulen mb-2"></h2>
+                    <p id="detailCode" class="text-gray-500 mb-2"></p>
                     <p id="detailBrand" class="text-lg text-gray-500 mb-4"></p>
                     <div class="mb-4">
                         <h4 class="font-bold text-gray-800">ស្ថានភាព:</h4>
@@ -481,6 +487,7 @@
 
         const productsRef = ref(db, 'products');
         const categoriesRef = ref(db, 'categories');
+        const metadataRef = ref(db, 'metadata');
 
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
@@ -524,6 +531,7 @@
                         ${product.status === 'soldOut' ? `<div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-30 flex items-center justify-center"><span class="text-red-500 font-bold text-xl font-koulen transform -rotate-12 border-2 border-red-500 p-2 rounded bg-white bg-opacity-75">អស់ពីស្តុក</span></div>` : ''}
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
+                        <p class="text-xs text-gray-400 font-mono">${product.productCode || ''}</p>
                         <h3 class="text-lg font-bold text-gray-800 truncate">${product.name}</h3>
                         <p class="text-sm text-gray-500">${product.brand}</p>
                         <div class="flex justify-between items-center mt-2">
@@ -589,7 +597,8 @@
                 filtered = filtered.filter(p => 
                     (p.name && p.name.toLowerCase().includes(searchTerm)) ||
                     (p.brand && p.brand.toLowerCase().includes(searchTerm)) ||
-                    (p.description && p.description.toLowerCase().includes(searchTerm))
+                    (p.description && p.description.toLowerCase().includes(searchTerm)) ||
+                    (p.productCode && p.productCode.toLowerCase().includes(searchTerm))
                 );
             }
             return filtered;
@@ -689,7 +698,7 @@
 
         adminLoginBtn.addEventListener('click', () => { loginModal.style.display = 'flex'; });
         closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
-        adminPanelBtn.addEventListener('click', () => { adminModal.style.display = 'flex'; resetProductForm(); });
+        adminPanelBtn.addEventListener('click', () => { prepareNewProductForm(); adminModal.style.display = 'flex'; });
         closeAdminModal.addEventListener('click', () => { adminModal.style.display = 'none'; });
         closeDetailModal.addEventListener('click', () => { productDetailModal.style.display = 'none'; });
         closeZoomModal.addEventListener('click', () => { imageZoomModal.style.display = 'none'; });
@@ -721,9 +730,10 @@
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
             
-            currentDetailProductId = productId; // Store current product ID for sharing
+            currentDetailProductId = productId; 
 
             document.getElementById('detailName').textContent = product.name;
+            document.getElementById('detailCode').innerHTML = `លេខកូដផលិតផល: <span class="text-red-500 font-bold text-base">${product.productCode || 'N/A'}</span>`;
             document.getElementById('detailBrand').textContent = product.brand;
             document.getElementById('detailPrice').textContent = `$${product.price}`;
             document.getElementById('detailCategory').textContent = product.category;
@@ -811,6 +821,7 @@
                 showNotification("សូមបញ្ចូល URL រូបភាពយ៉ាងតិចមួយ។", true);
                 return;
             }
+            
             const productData = {
                 name: document.getElementById('productName').value,
                 brand: document.getElementById('productBrand').value,
@@ -821,20 +832,31 @@
                 status: document.getElementById('productStatus').value,
                 imageUrls: imageUrls
             };
+
             try {
                 if (editingProductId) {
                     const currentProduct = allProducts.find(p => p.id === editingProductId);
                     productData.views = currentProduct.views || 0;
+                    productData.productCode = currentProduct.productCode;
                     await update(ref(db, `products/${editingProductId}`), productData);
                     showNotification('កែប្រែផលិតផលបានជោគជ័យ!');
                 } else {
-                    productData.views = 0;
-                    await set(push(productsRef), productData);
-                    showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
+                    const counterRef = ref(db, 'metadata/lastProductCode');
+                    const result = await runTransaction(counterRef, (currentValue) => (currentValue || 0) + 1);
+                    if (result.committed) {
+                        const nextId = result.snapshot.val();
+                        productData.productCode = `JTC-${String(nextId).padStart(4, '0')}`;
+                        productData.views = 0;
+                        await set(push(productsRef), productData);
+                        showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
+                    } else {
+                        throw new Error("Failed to generate product code.");
+                    }
                 }
                 resetProductForm();
                 adminModal.style.display = 'none';
             } catch (error) {
+                console.error("Error saving product:", error);
                 showNotification('មានបញ្ហាក្នុងការរក្សាទុកផលិតផល។', true);
             }
         });
@@ -853,6 +875,16 @@
             }
         });
 
+        async function prepareNewProductForm() {
+            resetProductForm();
+            onValue(ref(db, 'metadata/lastProductCode'), (snapshot) => {
+                const lastId = snapshot.val() || 0;
+                const nextId = lastId + 1;
+                document.getElementById('productCode').value = `JTC-${String(nextId).padStart(4, '0')}`;
+                setTimeout(() => document.getElementById('productName').focus(), 50);
+            }, { onlyOnce: true });
+        }
+
         function handleEditProduct(e) {
             e.stopPropagation();
             const id = e.target.closest('button').dataset.id;
@@ -860,7 +892,7 @@
             if (product) {
                 resetProductForm();
                 editingProductId = id; 
-                document.getElementById('productId').value = product.id;
+                document.getElementById('productCode').value = product.productCode || 'N/A';
                 document.getElementById('productName').value = product.name;
                 document.getElementById('productBrand').value = product.brand;
                 document.getElementById('productCategory').value = product.category;
@@ -880,7 +912,7 @@
                 cancelEditBtn.classList.remove('hidden');
                 resetViewBtn.classList.remove('hidden');
                 adminModal.style.display = 'flex';
-                productForm.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => document.getElementById('productName').focus(), 50);
             }
         }
 
@@ -913,12 +945,13 @@
             imageInputsContainer.innerHTML = '';
             addImageInput();
             editingProductId = null;
-            formTitle.textContent = 'បន្ថែម/កែប្រែផលិតផល';
-            cancelEditBtn.classList.add('hidden');
+            formTitle.textContent = 'បន្ថែមផលិតផលថ្មី';
+            cancelEditBtn.classList.remove('hidden');
             resetViewBtn.classList.add('hidden');
+            document.getElementById('productCode').value = 'កំពុងបង្កើត...';
         }
 
-        cancelEditBtn.addEventListener('click', resetProductForm);
+        cancelEditBtn.addEventListener('click', () => adminModal.style.display = 'none');
 
         resetViewBtn.addEventListener('click', async () => {
             if (!editingProductId) return;
@@ -948,7 +981,6 @@
             }
         });
 
-        // Share Functionality
         shareBtn.addEventListener('click', async () => {
             if (!currentDetailProductId) return;
             const product = allProducts.find(p => p.id === currentDetailProductId);
@@ -965,7 +997,6 @@
                 if (navigator.share) {
                     await navigator.share(shareData);
                 } else {
-                    // Fallback for desktop: copy to clipboard
                     const dummy = document.createElement('textarea');
                     document.body.appendChild(dummy);
                     dummy.value = shareUrl;
@@ -992,7 +1023,6 @@
 
         async function main() {
             await initializeAuth();
-            resetProductForm();
         }
 
         main();
