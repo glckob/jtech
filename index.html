@@ -250,13 +250,13 @@
                         <textarea id="productDescription" rows="3" class="w-full p-2 border rounded-lg"></textarea>
                     </div>
                     
-                    <!-- Multiple Image URLs -->
+                    <!-- Simplified Multiple Image Inputs -->
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 mb-2">URL រូបភាព (រហូតដល់ ១០)</label>
-                        <div id="imageUrlsContainer" class="space-y-2">
+                        <div id="imageInputsContainer" class="space-y-2">
                             <!-- Image URL inputs will be added here -->
                         </div>
-                        <button type="button" id="addImageUrlBtn" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded-lg">បន្ថែម URL</button>
+                        <button type="button" id="addImageInputBtn" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded-lg">បន្ថែម URL</button>
                     </div>
 
                     <div class="md:col-span-2 flex justify-end space-x-3">
@@ -335,6 +335,8 @@
             remove,
             update
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        
+        // NOTE: Firebase Storage is NOT imported in this version.
 
         // --- Firebase Configuration ---
         const firebaseConfig = {
@@ -363,15 +365,12 @@
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const adminPanelBtn = document.getElementById('adminPanelBtn');
         const logoutBtn = document.getElementById('logoutBtn');
-        // Modals
         const loginModal = document.getElementById('loginModal');
         const adminModal = document.getElementById('adminModal');
         const productDetailModal = document.getElementById('productDetailModal');
-        // Modal Close Buttons
         const closeLoginModal = document.getElementById('closeLoginModal');
         const closeAdminModal = document.getElementById('closeAdminModal');
         const closeDetailModal = document.getElementById('closeDetailModal');
-        // Forms
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
         const productForm = document.getElementById('productForm');
@@ -380,9 +379,8 @@
         const categoryList = document.getElementById('categoryList');
         const formTitle = document.getElementById('formTitle');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
-        // New Elements
-        const imageUrlsContainer = document.getElementById('imageUrlsContainer');
-        const addImageUrlBtn = document.getElementById('addImageUrlBtn');
+        const imageInputsContainer = document.getElementById('imageInputsContainer');
+        const addImageInputBtn = document.getElementById('addImageInputBtn');
 
         // --- Global State ---
         let allProducts = [];
@@ -395,9 +393,7 @@
             notification.textContent = message;
             notification.style.backgroundColor = isError ? '#ef4444' : '#22c55e';
             notification.classList.add('show');
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+            setTimeout(() => { notification.classList.remove('show'); }, 3000);
         }
 
         // --- Authentication ---
@@ -457,7 +453,7 @@
             products.forEach(product => {
                 const card = document.createElement('div');
                 card.className = 'product-card bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
-                card.dataset.id = product.id; // Add product ID to the card for click event
+                card.dataset.id = product.id;
 
                 const mainImage = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) 
                     ? product.imageUrls[0] 
@@ -484,43 +480,56 @@
                 productGrid.appendChild(card);
             });
 
-            // Add event listeners
             document.querySelectorAll('.product-card').forEach(card => card.addEventListener('click', handleProductClick));
             document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEditProduct));
             document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteProduct));
         }
 
         function filterProducts() {
-            // ... (filtering logic is the same)
-            const searchTerm = searchInput.value.toLowerCase();
+            const searchTerm = searchInput.value.toLowerCase().trim();
             const category = categoryFilter.value;
             const brand = brandFilter.value;
             const price = priceFilter.value;
 
             return allProducts.filter(p => {
-                const nameMatch = p.name.toLowerCase().includes(searchTerm);
-                const brandMatch = p.brand.toLowerCase().includes(searchTerm);
-                const descriptionMatch = p.description ? p.description.toLowerCase().includes(searchTerm) : true;
-                const categoryMatch = category ? p.category === category : true;
-                const brandFilterMatch = brand ? p.brand === brand : true;
-                
-                const priceMatch = (() => {
-                    if (!p.price) return price === '';
-                    switch (price) {
-                        case '<100': return p.price < 100;
-                        case '100-300': return p.price >= 100 && p.price <= 300;
-                        case '>300': return p.price > 300;
-                        default: return true;
-                    }
-                })();
+                if (!p) return false; // Safety check
 
-                return (nameMatch || brandMatch || descriptionMatch) && categoryMatch && brandFilterMatch && priceMatch;
+                // Price filter check
+                if (price) {
+                    const productPrice = parseFloat(p.price);
+                    if (isNaN(productPrice)) return false; 
+                    if (price === '<100' && productPrice >= 100) return false;
+                    if (price === '100-300' && (productPrice < 100 || productPrice > 300)) return false;
+                    if (price === '>300' && productPrice <= 300) return false;
+                }
+
+                // Category filter check
+                if (category && p.category !== category) {
+                    return false;
+                }
+
+                // Brand filter check
+                if (brand && p.brand !== brand) {
+                    return false;
+                }
+
+                // Text search check
+                if (searchTerm) {
+                    const inName = p.name && p.name.toLowerCase().includes(searchTerm);
+                    const inBrand = p.brand && p.brand.toLowerCase().includes(searchTerm);
+                    const inDescription = p.description && p.description.toLowerCase().includes(searchTerm);
+                    if (!inName && !inBrand && !inDescription) {
+                        return false;
+                    }
+                }
+
+                // If all checks pass, include the product
+                return true;
             });
         }
         
         function populateFilters() {
-            // ... (filter population logic is the same)
-            const brands = [...new Set(allProducts.map(p => p.brand))];
+            const brands = [...new Set(allProducts.map(p => p.brand).filter(b => b))]; // Filter out undefined/null brands
             brandFilter.innerHTML = '<option value="">គ្រប់ម៉ាក</option>';
             brands.sort().forEach(brand => {
                 brandFilter.innerHTML += `<option value="${brand}">${brand}</option>`;
@@ -528,18 +537,15 @@
         }
 
         function populateCategorySelects() {
-            // ... (category population logic is the same)
              const optionsHTML = allCategories
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map(cat => `<option value="${cat.name}">${cat.name}</option>`)
                 .join('');
-            
             categoryFilter.innerHTML = '<option value="">គ្រប់ប្រភេទ</option>' + optionsHTML;
             document.getElementById('productCategory').innerHTML = optionsHTML;
         }
 
         function renderCategoryList() {
-            // ... (category list rendering is the same)
             categoryList.innerHTML = '';
             allCategories
                 .sort((a, b) => a.name.localeCompare(b.name))
@@ -552,17 +558,23 @@
                     `;
                     categoryList.appendChild(el);
                 });
-            
-            document.querySelectorAll('.delete-category-btn').forEach(btn => {
-                btn.addEventListener('click', handleDeleteCategory);
-            });
+            document.querySelectorAll('.delete-category-btn').forEach(btn => btn.addEventListener('click', handleDeleteCategory));
         }
 
-        function applyFilters() { renderProducts(filterProducts()); }
+        function applyFilters() { 
+            const filtered = filterProducts();
+            renderProducts(filtered);
+        }
+        
+        // Add event listeners to all filters
+        [searchInput, categoryFilter, brandFilter, priceFilter].forEach(el => {
+            el.addEventListener('input', applyFilters); // 'input' for search box
+            el.addEventListener('change', applyFilters); // 'change' for dropdowns
+        });
+
 
         // --- Modal & Form Logic ---
 
-        // Event Listeners for Modals
         adminLoginBtn.addEventListener('click', () => { loginModal.style.display = 'flex'; });
         closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
         adminPanelBtn.addEventListener('click', () => { adminModal.style.display = 'flex'; resetProductForm(); });
@@ -575,12 +587,8 @@
             if (e.target === productDetailModal) productDetailModal.style.display = 'none';
         });
 
-        // Product Detail Modal Logic
         function handleProductClick(e) {
-            // Prevent opening detail modal if an admin button was clicked
-            if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) {
-                return;
-            }
+            if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) { return; }
             const productId = e.currentTarget.dataset.id;
             showProductDetails(productId);
         }
@@ -589,21 +597,17 @@
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
 
-            // Populate text content
             document.getElementById('detailName').textContent = product.name;
             document.getElementById('detailBrand').textContent = product.brand;
             document.getElementById('detailPrice').textContent = `$${product.price}`;
             document.getElementById('detailCategory').textContent = product.category;
             document.getElementById('detailDescription').textContent = product.description;
 
-            // Populate image gallery
             const mainImageEl = document.getElementById('mainImage');
             const thumbnailContainer = document.getElementById('thumbnailContainer');
             thumbnailContainer.innerHTML = '';
 
-            const images = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) 
-                ? product.imageUrls 
-                : [];
+            const images = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) ? product.imageUrls : [];
             
             if (images.length > 0) {
                 mainImageEl.src = images[0];
@@ -622,12 +626,9 @@
             } else {
                  mainImageEl.src = 'https://placehold.co/800x600/e2e8f0/64748b?text=No+Image';
             }
-
             productDetailModal.style.display = 'flex';
         }
 
-
-        // Admin Actions
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loginError.textContent = '';
@@ -638,7 +639,6 @@
                 loginModal.style.display = 'none';
                 loginForm.reset();
             } catch (error) {
-                console.error("Login failed:", error.message);
                 loginError.textContent = 'អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។';
             }
         });
@@ -648,38 +648,34 @@
             catch (error) { console.error("Logout failed:", error); }
         });
 
-        // Multiple Image URL Logic
-        addImageUrlBtn.addEventListener('click', () => {
-            if (imageUrlsContainer.children.length < 10) {
-                addUrlInput();
+        // --- Simplified Image URL Logic ---
+        addImageInputBtn.addEventListener('click', () => {
+            if (imageInputsContainer.children.length < 10) {
+                addImageInput();
             } else {
                 showNotification("អាចបន្ថែមរូបភាពបានត្រឹមតែ ១០ ប៉ុណ្ណោះ។", true);
             }
         });
 
-        function addUrlInput(value = '') {
+        function addImageInput(value = '') {
             const div = document.createElement('div');
             div.className = 'flex items-center space-x-2';
             div.innerHTML = `
-                <input type="text" class="image-url-input w-full p-2 border rounded-lg" placeholder="https://..." value="${value}">
-                <button type="button" class="remove-url-btn bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">X</button>
+                <input type="text" class="image-url-input w-full p-2 border rounded-lg" placeholder="បិទភ្ជាប់ URL ពី ImgBB..." value="${value}">
+                <button type="button" class="remove-url-btn bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold">X</button>
             `;
             div.querySelector('.remove-url-btn').addEventListener('click', () => div.remove());
-            imageUrlsContainer.appendChild(div);
+            imageInputsContainer.appendChild(div);
         }
 
         productForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const imageUrls = Array.from(document.querySelectorAll('.image-url-input'))
-                                   .map(input => input.value.trim())
-                                   .filter(url => url); // Filter out empty strings
-
+                                   .map(input => input.value.trim()).filter(url => url);
             if (imageUrls.length === 0) {
                 showNotification("សូមបញ្ចូល URL រូបភាពយ៉ាងតិចមួយ។", true);
                 return;
             }
-
             const productData = {
                 name: document.getElementById('productName').value,
                 brand: document.getElementById('productBrand').value,
@@ -688,21 +684,17 @@
                 description: document.getElementById('productDescription').value,
                 imageUrls: imageUrls
             };
-
             try {
                 if (editingProductId) {
-                    const productRef = ref(db, `products/${editingProductId}`);
-                    await update(productRef, productData);
+                    await update(ref(db, `products/${editingProductId}`), productData);
                     showNotification('កែប្រែផលិតផលបានជោគជ័យ!');
                 } else {
-                    const newProductRef = push(productsRef);
-                    await set(newProductRef, productData);
+                    await set(push(productsRef), productData);
                     showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
                 }
                 resetProductForm();
                 adminModal.style.display = 'none';
             } catch (error) {
-                console.error("Error saving product:", error);
                 showNotification('មានបញ្ហាក្នុងការរក្សាទុកផលិតផល។', true);
             }
         });
@@ -712,23 +704,21 @@
             const name = newCategoryName.value.trim();
             if (name) {
                 try {
-                    const newCategoryRef = push(categoriesRef);
-                    await set(newCategoryRef, { name });
+                    await set(push(categoriesRef), { name });
                     showNotification(`បានបន្ថែមប្រភេទ "${name}"`);
                     newCategoryName.value = '';
                 } catch (error) {
-                    console.error("Error adding category: ", error);
                     showNotification('មានបញ្ហាក្នុងការបន្ថែមប្រភេទ។', true);
                 }
             }
         });
 
         function handleEditProduct(e) {
-            e.stopPropagation(); // Prevent card click event from firing
+            e.stopPropagation();
             editingProductId = e.target.closest('button').dataset.id;
             const product = allProducts.find(p => p.id === editingProductId);
             if (product) {
-                resetProductForm(); // Clear previous state
+                resetProductForm();
                 document.getElementById('productId').value = product.id;
                 document.getElementById('productName').value = product.name;
                 document.getElementById('productBrand').value = product.brand;
@@ -737,7 +727,7 @@
                 document.getElementById('productDescription').value = product.description;
 
                 if (Array.isArray(product.imageUrls)) {
-                    product.imageUrls.forEach(url => addUrlInput(url));
+                    product.imageUrls.forEach(url => addImageInput(url));
                 }
 
                 formTitle.textContent = 'កែប្រែផលិតផល';
@@ -748,16 +738,13 @@
         }
 
         async function handleDeleteProduct(e) {
-            e.stopPropagation(); // Prevent card click event from firing
+            e.stopPropagation();
             const id = e.target.closest('button').dataset.id;
             if (confirm('តើអ្នកពិតជាចង់លុបផលិតផលនេះមែនទេ?')) {
                 try {
                     await remove(ref(db, `products/${id}`));
                     showNotification('ផលិតផលត្រូវបានលុប។', true);
-                } catch (error) {
-                    console.error("Error deleting product:", error);
-                    showNotification('មានបញ្ហាក្នុងការលុបផលិតផល។', true);
-                }
+                } catch (error) { showNotification('មានបញ្ហាក្នុងការលុបផលិតផល។', true); }
             }
         }
 
@@ -767,17 +754,14 @@
                 try {
                     await remove(ref(db, `categories/${id}`));
                     showNotification('ប្រភេទត្រូវបានលុប។', true);
-                } catch (error) {
-                    console.error("Error deleting category:", error);
-                    showNotification('មានបញ្ហាក្នុងការលុបប្រភេទ។', true);
-                }
+                } catch (error) { showNotification('មានបញ្ហាក្នុងការលុបប្រភេទ។', true); }
             }
         }
         
         function resetProductForm() {
             productForm.reset();
-            imageUrlsContainer.innerHTML = ''; // Clear all image URL inputs
-            addUrlInput(); // Add one empty input to start
+            imageInputsContainer.innerHTML = '';
+            addImageInput();
             editingProductId = null;
             formTitle.textContent = 'បន្ថែម/កែប្រែផលិតផល';
             cancelEditBtn.classList.add('hidden');
