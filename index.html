@@ -39,6 +39,9 @@
         #productDetailModal .modal-content {
             max-width: 800px;
         }
+        #imageZoomModal {
+            background-color: rgba(0,0,0,0.85);
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
@@ -88,16 +91,16 @@
     <!-- Header -->
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
+            <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <a href="#" class="text-2xl md:text-3xl text-blue-600 font-koulen">J-TECH CAMBODIA</a>
+                    <a href="#" class="text-xl md:text-2xl text-blue-600 font-koulen">J-TECH CAMBODIA</a>
                 </div>
                 <div class="hidden md:flex items-center space-x-4">
                     <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span class="font-semibold text-gray-700">097 244 4424 / 096 717 212</span>
+                        <span class="font-semibold text-gray-700 text-sm">097 244 4424 / 096 717 212</span>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -113,14 +116,14 @@
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
         
         <!-- Hero Banner -->
-        <section class="hero-banner text-white rounded-lg shadow-lg p-8 md:p-12 mb-8 flex items-center">
-            <div class="w-full md:w-1/2">
-                <h2 class="text-3xl md:text-5xl font-koulen mb-4">ផលិតផលគុណភាពពីជប៉ុន</h2>
-                <p class="mb-6">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
-                <a href="#productGrid" class="bg-white text-blue-600 font-bold py-3 px-6 rounded-lg hover:bg-gray-200 transition duration-300">មើលផលិតផលទាំងអស់</a>
+        <section class="hero-banner text-white rounded-lg shadow-lg p-6 md:p-8 mb-8 flex items-center">
+            <div class="w-full md:w-2/3">
+                <h2 class="text-2xl md:text-4xl font-koulen mb-3">ផលិតផលគុណភាពពីជប៉ុន</h2>
+                <p class="mb-5 text-sm md:text-base">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
+                <a href="#productGrid" class="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg hover:bg-gray-200 transition duration-300 text-sm">មើលផលិតផលទាំងអស់</a>
             </div>
-            <div class="hidden md:block w-1/2 text-center">
-                 <img src="https://placehold.co/400x300/ffffff/0052D4?text=J-TECH" alt="J-Tech Product" class="mx-auto rounded-lg">
+            <div class="hidden md:block w-1/3 text-center">
+                 <img src="https://placehold.co/300x200/ffffff/0052D4?text=J-TECH" alt="J-Tech Product" class="mx-auto rounded-lg">
             </div>
         </section>
 
@@ -287,7 +290,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Image Gallery -->
                 <div>
-                    <img id="mainImage" src="" alt="Product Image" class="w-full h-80 object-cover rounded-lg mb-4">
+                    <img id="mainImage" src="" alt="Product Image" class="w-full h-80 object-contain bg-white rounded-lg mb-4">
                     <div id="thumbnailContainer" class="grid grid-cols-5 gap-2">
                         <!-- Thumbnails will be generated here -->
                     </div>
@@ -309,6 +312,12 @@
             </div>
             <button id="closeDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
         </div>
+    </div>
+
+    <!-- Image Zoom Modal -->
+    <div id="imageZoomModal" class="modal">
+        <span id="closeZoomModal" class="absolute top-5 right-8 text-white text-5xl font-bold cursor-pointer hover:text-gray-300">&times;</span>
+        <img class="m-auto max-w-[90%] max-h-[90%] rounded-lg" id="zoomedImage">
     </div>
 
 
@@ -368,9 +377,11 @@
         const loginModal = document.getElementById('loginModal');
         const adminModal = document.getElementById('adminModal');
         const productDetailModal = document.getElementById('productDetailModal');
+        const imageZoomModal = document.getElementById('imageZoomModal');
         const closeLoginModal = document.getElementById('closeLoginModal');
         const closeAdminModal = document.getElementById('closeAdminModal');
         const closeDetailModal = document.getElementById('closeDetailModal');
+        const closeZoomModal = document.getElementById('closeZoomModal');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
         const productForm = document.getElementById('productForm');
@@ -460,7 +471,9 @@
                     : 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
 
                 card.innerHTML = `
-                    <img src="${mainImage}" alt="${product.name}" class="w-full h-48 object-cover">
+                    <div class="h-48 bg-white flex items-center justify-center">
+                        <img src="${mainImage}" alt="${product.name}" class="max-w-full max-h-full object-contain">
+                    </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-lg font-bold text-gray-800 truncate">${product.name}</h3>
                         <p class="text-sm text-gray-500">${product.brand}</p>
@@ -492,9 +505,8 @@
             const price = priceFilter.value;
 
             return allProducts.filter(p => {
-                if (!p) return false; // Safety check
+                if (!p) return false;
 
-                // Price filter check
                 if (price) {
                     const productPrice = parseFloat(p.price);
                     if (isNaN(productPrice)) return false; 
@@ -502,34 +514,20 @@
                     if (price === '100-300' && (productPrice < 100 || productPrice > 300)) return false;
                     if (price === '>300' && productPrice <= 300) return false;
                 }
-
-                // Category filter check
-                if (category && p.category !== category) {
-                    return false;
-                }
-
-                // Brand filter check
-                if (brand && p.brand !== brand) {
-                    return false;
-                }
-
-                // Text search check
+                if (category && p.category !== category) return false;
+                if (brand && p.brand !== brand) return false;
                 if (searchTerm) {
                     const inName = p.name && p.name.toLowerCase().includes(searchTerm);
                     const inBrand = p.brand && p.brand.toLowerCase().includes(searchTerm);
                     const inDescription = p.description && p.description.toLowerCase().includes(searchTerm);
-                    if (!inName && !inBrand && !inDescription) {
-                        return false;
-                    }
+                    if (!inName && !inBrand && !inDescription) return false;
                 }
-
-                // If all checks pass, include the product
                 return true;
             });
         }
         
         function populateFilters() {
-            const brands = [...new Set(allProducts.map(p => p.brand).filter(b => b))]; // Filter out undefined/null brands
+            const brands = [...new Set(allProducts.map(p => p.brand).filter(b => b))];
             brandFilter.innerHTML = '<option value="">គ្រប់ម៉ាក</option>';
             brands.sort().forEach(brand => {
                 brandFilter.innerHTML += `<option value="${brand}">${brand}</option>`;
@@ -566,10 +564,9 @@
             renderProducts(filtered);
         }
         
-        // Add event listeners to all filters
         [searchInput, categoryFilter, brandFilter, priceFilter].forEach(el => {
-            el.addEventListener('input', applyFilters); // 'input' for search box
-            el.addEventListener('change', applyFilters); // 'change' for dropdowns
+            el.addEventListener('input', applyFilters);
+            el.addEventListener('change', applyFilters);
         });
 
 
@@ -580,17 +577,24 @@
         adminPanelBtn.addEventListener('click', () => { adminModal.style.display = 'flex'; resetProductForm(); });
         closeAdminModal.addEventListener('click', () => { adminModal.style.display = 'none'; });
         closeDetailModal.addEventListener('click', () => { productDetailModal.style.display = 'none'; });
+        closeZoomModal.addEventListener('click', () => { imageZoomModal.style.display = 'none'; });
         
         window.addEventListener('click', (e) => {
             if (e.target === loginModal) loginModal.style.display = 'none';
             if (e.target === adminModal) adminModal.style.display = 'none';
             if (e.target === productDetailModal) productDetailModal.style.display = 'none';
+            if (e.target === imageZoomModal) imageZoomModal.style.display = 'none';
         });
 
         function handleProductClick(e) {
             if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) { return; }
             const productId = e.currentTarget.dataset.id;
             showProductDetails(productId);
+        }
+
+        function openZoomModal(imageUrl) {
+            document.getElementById('zoomedImage').src = imageUrl;
+            imageZoomModal.style.display = 'flex';
         }
 
         function showProductDetails(productId) {
@@ -611,6 +615,9 @@
             
             if (images.length > 0) {
                 mainImageEl.src = images[0];
+                mainImageEl.classList.add('cursor-pointer');
+                mainImageEl.onclick = () => openZoomModal(mainImageEl.src);
+
                 images.forEach((url, index) => {
                     const thumb = document.createElement('img');
                     thumb.src = url;
@@ -625,6 +632,8 @@
                 });
             } else {
                  mainImageEl.src = 'https://placehold.co/800x600/e2e8f0/64748b?text=No+Image';
+                 mainImageEl.classList.remove('cursor-pointer');
+                 mainImageEl.onclick = null;
             }
             productDetailModal.style.display = 'flex';
         }
@@ -648,7 +657,6 @@
             catch (error) { console.error("Logout failed:", error); }
         });
 
-        // --- Simplified Image URL Logic ---
         addImageInputBtn.addEventListener('click', () => {
             if (imageInputsContainer.children.length < 10) {
                 addImageInput();
