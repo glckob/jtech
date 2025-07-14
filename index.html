@@ -94,6 +94,42 @@
             color: white;
             border-color: #2563eb;
         }
+        /* Slideshow Styles */
+        .slideshow-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+        .slide {
+            display: none;
+            width: 100%;
+            animation: fadeIn 0.7s ease-in-out;
+        }
+        .slide-text-container {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out 0.3s, transform 0.5s ease-out 0.3s;
+        }
+        .slide.active .slide-text-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .slide-dot {
+            cursor: pointer;
+            height: 12px;
+            width: 12px;
+            margin: 0 4px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+        .slide-dot.active, .slide-dot:hover {
+            background-color: #717171;
+        }
+        .slide-image {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -138,6 +174,19 @@
                  <img src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-Tech Product" class="mx-auto rounded-lg h-32">
             </div>
         </section>
+        
+        <!-- Slideshow Section -->
+        <div class="mb-8">
+            <div id="slideshowContainer" class="slideshow-container w-full h-64 md:h-80 bg-white">
+                <!-- Slides will be injected here -->
+            </div>
+            <div id="slide-dots" class="text-center p-4"></div>
+        </div>
+
+        <!-- Featured Sections -->
+        <div id="featured-sections" class="space-y-12 mb-12">
+            <!-- New Arrivals and Popular sections will be generated here -->
+        </div>
 
         <!-- Filters -->
         <div class="bg-white p-4 rounded-lg shadow-md mb-8">
@@ -180,16 +229,16 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
                     <h3 class="font-koulen text-2xl mb-4">J-TECH CAMBODIA</h3>
-                    <p class="text-gray-400">នាំចូល និងចែកចាយផលិតផល មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
+                    <p class="text-gray-400">នាំចូល និងចែកចាយផលិតផល IT មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
                      <p class="text-gray-300 mt-4 flex items-start space-x-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                         <span>ផ្លូវលំទី៣ នៃផ្លូវ 371 ក្បែរផ្សារ 2002</span>
                     </p>
                     <div id="auth-footer-section" class="mt-4">
-                        <button id="adminLoginBtn" class="text-blue-400 hover:text-blue-300 text-sm">Login</button>
+                        <button id="adminLoginBtn" class="text-blue-400 hover:text-blue-300 text-sm">Admin Login</button>
                         <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">ផ្ទាំងបញ្ជា</button>
                         <button id="resetAllViewsBtn" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">Reset All Views</button>
-                        <button id="logoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">ចាកចេញ</button>
+                        <button id="adminLogoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">ចាកចេញ (Admin)</button>
                     </div>
                 </div>
                 <div>
@@ -205,7 +254,7 @@
                         </li>
                     </ul>
                      <div class="mt-4">
-                        <a href="https://www.flagcounter.me/details/f3Y"><img src="https://www.flagcounter.me/f3Y/" alt="Flag Counter"></a>
+                        <a href="https://www.flagcounter.me/details/f3Y"><img src="https://www.flagcounter.me/f3Y/" alt="Flag Counter" class="rounded-md"></a>
                     </div>
                 </div>
                 <div>
@@ -254,10 +303,10 @@
     <!-- Admin Panel Modal -->
     <div id="adminModal" class="modal">
         <div class="modal-content max-w-4xl">
-            <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រងផលិតផល</h2>
+            <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រង</h2>
             
             <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
-                <h3 id="formTitle" class="text-xl font-koulen mb-4">បន្ថែម/កែប្រែផលិតផល</h3>
+                <h3 id="formTitle" class="text-xl font-koulen mb-4">គ្រប់គ្រងផលិតផល</h3>
                 <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="hidden" id="productId">
                     <div>
@@ -323,7 +372,24 @@
                 </div>
             </div>
 
-            <div class="flex justify-end">
+            <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                <h3 class="text-xl font-koulen mb-4">គ្រប់គ្រងស្លាយ</h3>
+                <form id="slideForm" class="space-y-4">
+                    <input type="hidden" id="slideId">
+                    <div>
+                        <label class="block text-gray-700">URL រូបភាពស្លាយ</label>
+                        <input type="text" id="slideImageUrl" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">អត្ថបទស្លាយ</label>
+                        <textarea id="slideText" rows="2" class="w-full p-2 border rounded-lg" required></textarea>
+                    </div>
+                    <button type="submit" id="slideSubmitBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">បន្ថែមស្លាយ</button>
+                </form>
+                <div id="slideList" class="mt-4 space-y-2"></div>
+            </div>
+
+            <div class="flex justify-end mt-6">
                 <button type="button" id="closeAdminModal" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">បិទផ្ទាំងបញ្ជា</button>
             </div>
         </div>
@@ -345,7 +411,7 @@
                         <h4 class="font-bold text-gray-800">ស្ថានភាព:</h4>
                         <p id="detailStatus" class=""></p>
                     </div>
-                    <p id="detailPrice" class="text-3xl font-bold text-blue-600 mb-4"></p>
+                    <p id="detailPrice" class="text-3xl font-bold text-red-600 mb-4"></p>
                     <div class="mb-4">
                         <h4 class="font-bold text-gray-800">ប្រភេទ:</h4>
                         <p id="detailCategory" class="text-gray-600"></p>
@@ -420,7 +486,7 @@
         const statusFilter = document.getElementById('statusFilter');
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const adminPanelBtn = document.getElementById('adminPanelBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
+        const adminLogoutBtn = document.getElementById('adminLogoutBtn');
         const resetAllViewsBtn = document.getElementById('resetAllViewsBtn');
         const loginModal = document.getElementById('loginModal');
         const adminModal = document.getElementById('adminModal');
@@ -443,14 +509,23 @@
         const imageInputsContainer = document.getElementById('imageInputsContainer');
         const addImageInputBtn = document.getElementById('addImageInputBtn');
         const shareBtn = document.getElementById('shareBtn');
+        const slideshowContainer = document.getElementById('slideshowContainer');
+        const slideForm = document.getElementById('slideForm');
+        const slideList = document.getElementById('slideList');
+        const slideSubmitBtn = document.getElementById('slideSubmitBtn');
+        const slideDotsContainer = document.getElementById('slide-dots');
 
         let allProducts = [];
         let allCategories = [];
+        let allSlides = [];
         let currentUser = null;
         let editingProductId = null;
+        let editingSlideId = null;
         let currentPage = 1;
         const productsPerPage = 25;
         let currentDetailProductId = null;
+        let slideIndex = 0;
+        let slideInterval;
 
         function showNotification(message, isError = false) {
             notification.textContent = message;
@@ -464,12 +539,12 @@
             if (user && !user.isAnonymous) {
                 adminLoginBtn.classList.add('hidden');
                 adminPanelBtn.classList.remove('hidden');
-                logoutBtn.classList.remove('hidden');
+                adminLogoutBtn.classList.remove('hidden');
                 resetAllViewsBtn.classList.remove('hidden');
             } else {
                 adminLoginBtn.classList.remove('hidden');
                 adminPanelBtn.classList.add('hidden');
-                logoutBtn.classList.add('hidden');
+                adminLogoutBtn.classList.add('hidden');
                 resetAllViewsBtn.classList.add('hidden');
             }
             applyFilters();
@@ -488,6 +563,7 @@
         const productsRef = ref(db, 'products');
         const categoriesRef = ref(db, 'categories');
         const metadataRef = ref(db, 'metadata');
+        const slideshowRef = ref(db, 'slideshow');
 
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
@@ -511,6 +587,13 @@
             allCategories = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
             populateCategorySelects();
             populateCategoryDropdown();
+        });
+
+        onValue(slideshowRef, (snapshot) => {
+            const data = snapshot.val();
+            allSlides = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            renderSlideshow();
+            renderSlideList();
         });
 
         function renderProducts(productsToRender) {
@@ -543,7 +626,7 @@
                         </div>
                         <div class="flex-grow"></div>
                         <div class="flex justify-between items-center mt-4">
-                            <p class="text-xl font-koulen text-blue-600">$${product.price}</p>
+                            <p class="text-xl font-koulen text-red-600">$${product.price ? parseFloat(product.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}</p>
                             <span class="text-xs font-bold ${product.status === 'soldOut' ? 'text-red-500' : 'text-green-500'}">${product.status === 'soldOut' ? 'អស់ស្តុក' : 'មានស្តុក'}</span>
                         </div>
                          ${(currentUser && !currentUser.isAnonymous) ? `
@@ -735,7 +818,7 @@
             document.getElementById('detailName').textContent = product.name;
             document.getElementById('detailCode').innerHTML = `លេខកូដផលិតផល: <span class="text-red-500 font-bold text-base">${product.productCode || 'N/A'}</span>`;
             document.getElementById('detailBrand').textContent = product.brand;
-            document.getElementById('detailPrice').textContent = `$${product.price}`;
+            document.getElementById('detailPrice').textContent = `$${product.price ? parseFloat(product.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}`;
             document.getElementById('detailCategory').textContent = product.category;
             document.getElementById('detailDescription').textContent = product.description;
 
@@ -793,7 +876,7 @@
             }
         });
         
-        logoutBtn.addEventListener('click', async () => {
+        adminLogoutBtn.addEventListener('click', async () => {
             try { await signOut(auth); await initializeAuth(); } 
             catch (error) { console.error("Logout failed:", error); }
         });
@@ -823,6 +906,7 @@
             }
             
             const productData = {
+                productCode: document.getElementById('productCode').value,
                 name: document.getElementById('productName').value,
                 brand: document.getElementById('productBrand').value,
                 category: document.getElementById('productCategory').value,
@@ -837,7 +921,6 @@
                 if (editingProductId) {
                     const currentProduct = allProducts.find(p => p.id === editingProductId);
                     productData.views = currentProduct.views || 0;
-                    productData.productCode = currentProduct.productCode;
                     await update(ref(db, `products/${editingProductId}`), productData);
                     showNotification('កែប្រែផលិតផលបានជោគជ័យ!');
                 } else {
@@ -1017,6 +1100,118 @@
                 const productExists = allProducts.some(p => p.id === productId);
                 if (productExists) {
                     showProductDetails(productId);
+                }
+            }
+        }
+
+        function renderSlideshow() {
+            slideshowContainer.innerHTML = '';
+            if (allSlides.length === 0) return;
+
+            allSlides.forEach(slide => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'slide absolute inset-0 bg-white flex items-center p-4';
+                slideDiv.innerHTML = `
+                    <div class="w-1/2 pr-4 slide-text-container">
+                        <p class="text-2xl font-bold text-gray-800">${slide.text}</p>
+                    </div>
+                    <div class="w-1/2 h-full slide-image-container">
+                        <img src="${slide.imageUrl}" class="w-full h-full object-contain rounded-lg slide-image">
+                    </div>
+                `;
+                slideshowContainer.appendChild(slideDiv);
+            });
+            slideIndex = 0;
+            showSlides();
+        }
+
+        function showSlides() {
+            if (allSlides.length === 0) return;
+            let slides = slideshowContainer.getElementsByClassName("slide");
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+                slides[i].classList.remove('active');
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}
+            slides[slideIndex-1].style.display = "flex";
+            setTimeout(() => {
+                slides[slideIndex-1].classList.add('active');
+            }, 50);
+            
+            clearInterval(slideInterval);
+            slideInterval = setTimeout(showSlides, 5000); 
+        }
+
+        function renderSlideList() {
+            slideList.innerHTML = '';
+            allSlides.forEach(slide => {
+                const el = document.createElement('div');
+                el.className = 'flex items-center justify-between bg-white p-2 rounded';
+                el.innerHTML = `
+                    <img src="${slide.imageUrl}" class="w-16 h-10 object-cover rounded">
+                    <p class="text-sm truncate mx-2 flex-grow">${slide.text}</p>
+                    <div class="flex space-x-2">
+                        <button data-id="${slide.id}" class="edit-slide-btn bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">✏️</button>
+                        <button data-id="${slide.id}" class="delete-slide-btn bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">X</button>
+                    </div>
+                `;
+                el.querySelector('.edit-slide-btn').addEventListener('click', handleEditSlide);
+                el.querySelector('.delete-slide-btn').addEventListener('click', handleDeleteSlide);
+                slideList.appendChild(el);
+            });
+        }
+
+        slideForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const imageUrl = document.getElementById('slideImageUrl').value;
+            const text = document.getElementById('slideText').value;
+            if (imageUrl && text) {
+                const slideData = { imageUrl, text };
+                try {
+                    if (editingSlideId) {
+                        await update(ref(db, `slideshow/${editingSlideId}`), slideData);
+                        showNotification('Update ស្លាយបានជោគជ័យ!');
+                    } else {
+                        await set(push(slideshowRef), slideData);
+                        showNotification('បានបន្ថែមស្លាយថ្មី!');
+                    }
+                    resetSlideForm();
+                } catch (error) {
+                    showNotification('មានបញ្ហាក្នុងការរក្សាទុកស្លាយ។', true);
+                }
+            }
+        });
+        
+        function resetSlideForm() {
+            slideForm.reset();
+            editingSlideId = null;
+            slideSubmitBtn.textContent = 'បន្ថែមស្លាយ';
+            slideSubmitBtn.classList.replace('bg-orange-500', 'bg-blue-500');
+            slideSubmitBtn.classList.replace('hover:bg-orange-600', 'hover:bg-blue-600');
+        }
+
+        function handleEditSlide(e) {
+            const id = e.target.dataset.id;
+            const slide = allSlides.find(s => s.id === id);
+            if (slide) {
+                editingSlideId = id;
+                document.getElementById('slideImageUrl').value = slide.imageUrl;
+                document.getElementById('slideText').value = slide.text;
+                slideSubmitBtn.textContent = 'Update ស្លាយ';
+                slideSubmitBtn.classList.replace('bg-blue-500', 'bg-orange-500');
+                slideSubmitBtn.classList.replace('hover:bg-blue-600', 'hover:bg-orange-600');
+            }
+        }
+
+        async function handleDeleteSlide(e) {
+            const id = e.target.dataset.id;
+            if (confirm('តើអ្នកពិតជាចង់លុបស្លាយនេះមែនទេ?')) {
+                try {
+                    await remove(ref(db, `slideshow/${id}`));
+                    showNotification('ស្លាយត្រូវបានលុប។', true);
+                } catch (error) {
+                    showNotification('មានបញ្ហាក្នុងការលុបស្លាយ។', true);
                 }
             }
         }
