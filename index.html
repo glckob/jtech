@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J-Tech Cambodia - ហាងលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចពីជប៉ុន</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -48,11 +49,12 @@
         }
         .product-card {
             cursor: pointer;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1), 0 0 15px -3px rgba(236, 72, 153, 0.3);
         }
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1), 0 0 25px -5px rgba(236, 72, 153, 0.5);
         }
         #notification {
             position: fixed;
@@ -84,6 +86,14 @@
         .thumbnail.active {
             border-color: #2563eb;
         }
+        .pagination-btn {
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .pagination-btn.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -92,7 +102,8 @@
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 flex items-center space-x-3">
+                    <img src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-TECH Logo" class="h-10">
                     <a href="#" class="text-xl md:text-2xl text-blue-600 font-koulen">J-TECH CAMBODIA</a>
                 </div>
                 <div class="hidden md:flex items-center space-x-4">
@@ -103,11 +114,6 @@
                         <span class="font-semibold text-gray-700 text-sm">097 244 4424 / 096 717 212</span>
                     </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button id="adminLoginBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Admin</button>
-                    <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">ផ្ទាំងបញ្ជា</button>
-                    <button id="logoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">ចាកចេញ</button>
-                </div>
             </div>
         </div>
     </header>
@@ -115,23 +121,29 @@
     <!-- Main Content -->
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
         
-        <!-- Hero Banner -->
         <section class="hero-banner text-white rounded-lg shadow-lg p-6 md:p-8 mb-8 flex items-center">
             <div class="w-full md:w-2/3">
                 <h2 class="text-2xl md:text-4xl font-koulen mb-3">ផលិតផលគុណភាពពីជប៉ុន</h2>
                 <p class="mb-5 text-sm md:text-base">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
-                <a href="#productGrid" class="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg hover:bg-gray-200 transition duration-300 text-sm">មើលផលិតផលទាំងអស់</a>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                    <a href="#productGrid" class="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg hover:bg-gray-200 transition duration-300 text-sm">មើលផលិតផលទាំងអស់</a>
+                    <div class="text-white text-sm">
+                        <p>ក្នុងស្តុក: <span id="inStockCount" class="font-bold">0</span></p>
+                        <p>អស់ពីស្តុក: <span id="soldOutCount" class="font-bold">0</span></p>
+                        <p>នាំចូលសរុប: <span id="totalImportCount" class="font-bold">0</span></p>
+                    </div>
+                </div>
             </div>
             <div class="hidden md:block w-1/3 text-center">
-                 <img src="https://placehold.co/300x200/ffffff/0052D4?text=J-TECH" alt="J-Tech Product" class="mx-auto rounded-lg">
+                 <img src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-Tech Product" class="mx-auto rounded-lg h-32">
             </div>
         </section>
 
         <!-- Filters -->
         <div class="bg-white p-4 rounded-lg shadow-md mb-8">
             <h3 class="text-xl font-koulen mb-4">ស្វែងរកផលិតផល</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <input id="searchInput" type="text" placeholder="វាយឈ្មោះទំនិញ..." class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <input id="searchInput" type="text" placeholder="វាយឈ្មោះទំនិញ..." class="col-span-2 lg:col-span-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <select id="categoryFilter" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     <option value="">គ្រប់ប្រភេទ</option>
                 </select>
@@ -144,16 +156,22 @@
                     <option value="100-300">$100 - $300</option>
                     <option value=">300">លើស $300</option>
                 </select>
+                <select id="statusFilter" class="p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="">ស្ថានភាព</option>
+                    <option value="inStock">មានក្នុងស្តុក</option>
+                    <option value="soldOut">អស់ពីស្តុក</option>
+                </select>
             </div>
         </div>
 
         <!-- Product Grid -->
-        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             <!-- Product cards will be inserted here by JavaScript -->
         </div>
-        <div id="noProductsMessage" class="hidden text-center text-gray-500 mt-10">
-            <p class="text-xl">មិនមានផលិតផលដែលត្រូវនឹងការស្វែងរករបស់អ្នកទេ។</p>
-        </div>
+        
+        <!-- Pagination Controls -->
+        <div id="paginationControls" class="mt-10 flex justify-center items-center space-x-2"></div>
+
     </main>
 
     <!-- Footer -->
@@ -167,6 +185,12 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
                         <span>ផ្លូវលំទី៣ នៃផ្លូវ 371 ក្បែរផ្សារ 2002</span>
                     </p>
+                    <div id="auth-footer-section" class="mt-4">
+                        <button id="adminLoginBtn" class="text-blue-400 hover:text-blue-300 text-sm">Login</button>
+                        <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">ផ្ទាំងបញ្ជា</button>
+                        <button id="resetAllViewsBtn" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">Reset All Views</button>
+                        <button id="logoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">ចាកចេញ</button>
+                    </div>
                 </div>
                 <div>
                     <h3 class="font-koulen text-xl mb-4">ទំនាក់ទំនង</h3>
@@ -180,15 +204,20 @@
                             <a href="https://t.me/lazytospeak" target="_blank" class="hover:text-blue-400 transition">Telegram Channel</a>
                         </li>
                     </ul>
+                     <div class="mt-4">
+                        <a href="https://www.flagcounter.me/details/f3Y"><img src="https://www.flagcounter.me/f3Y/" alt="Flag Counter"></a>
+                    </div>
                 </div>
                 <div>
-                    <h3 class="font-koulen text-xl mb-4">តាមដានពួកយើង</h3>
+                    <h3 class="font-koulen text-xl mb-4">ផែនទី និងតាមដានពួកយើង</h3>
                      <a href="https://www.facebook.com/J-TECH-Cambodia" target="_blank" class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clip-rule="evenodd" /></svg>
                         <span>J-TECH Cambodia</span>
                     </a>
                     <div class="mt-4">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3909.020419348274!2d104.8881680147858!3d11.54283179179975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x310951fac4884c99%3A0x8321a50c60d96356!2sJ-TECH%20Cambodia!5e0!3m2!1sen!2skh" width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="rounded-lg"></iframe>
+                        <a href="https://maps.app.goo.gl/JASuZyWud8ckqWPG6" target="_blank">
+                            <img src="https://i.ibb.co/dwdCfQLc/jtechmaps.jpg" alt="J-TECH Cambodia Map" class="rounded-lg hover:opacity-80 transition-opacity duration-300">
+                        </a>
                     </div>
                 </div>
             </div>
@@ -241,28 +270,36 @@
                     </div>
                      <div>
                         <label class="block text-gray-700">ប្រភេទ</label>
-                        <select id="productCategory" class="w-full p-2 border rounded-lg" required>
-                        </select>
+                        <select id="productCategory" class="w-full p-2 border rounded-lg" required></select>
                     </div>
                     <div>
                         <label class="block text-gray-700">តម្លៃ ($)</label>
                         <input type="number" id="productPrice" class="w-full p-2 border rounded-lg" required>
                     </div>
+                     <div>
+                        <label class="block text-gray-700">ចំនួននាំចូល</label>
+                        <input type="number" id="productImportQty" class="w-full p-2 border rounded-lg" value="1" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">ស្ថានភាព</label>
+                        <select id="productStatus" class="w-full p-2 border rounded-lg" required>
+                            <option value="inStock">មានក្នុងស្តុក</option>
+                            <option value="soldOut">អស់ពីស្តុក</option>
+                        </select>
+                    </div>
                     <div class="md:col-span-2">
                         <label class="block text-gray-700">ការពិពណ៌នា</label>
                         <textarea id="productDescription" rows="3" class="w-full p-2 border rounded-lg"></textarea>
                     </div>
-                    
-                    <!-- Simplified Multiple Image Inputs -->
+
                     <div class="md:col-span-2">
                         <label class="block text-gray-700 mb-2">URL រូបភាព (រហូតដល់ ១០)</label>
-                        <div id="imageInputsContainer" class="space-y-2">
-                            <!-- Image URL inputs will be added here -->
-                        </div>
+                        <div id="imageInputsContainer" class="space-y-2"></div>
                         <button type="button" id="addImageInputBtn" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded-lg">បន្ថែម URL</button>
                     </div>
 
                     <div class="md:col-span-2 flex justify-end space-x-3">
+                        <button type="button" id="resetViewBtn" class="hidden bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg">Reset View</button>
                         <button type="button" id="cancelEditBtn" class="hidden bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg">បោះបង់ការកែប្រែ</button>
                         <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">រក្សាទុក</button>
                     </div>
@@ -275,7 +312,10 @@
                     <input type="text" id="newCategoryName" placeholder="ឈ្មោះប្រភេទថ្មី..." class="flex-grow p-2 border rounded-lg" required>
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">បន្ថែម</button>
                 </form>
-                <div id="categoryList" class="space-y-2"></div>
+                <div class="mt-4 flex items-center gap-4">
+                    <select id="existingCategories" class="flex-grow p-2 border rounded-lg bg-white"></select>
+                    <button type="button" id="deleteCategoryBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">លុប</button>
+                </div>
             </div>
 
             <div class="flex justify-end">
@@ -288,17 +328,17 @@
     <div id="productDetailModal" class="modal">
         <div class="modal-content">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Image Gallery -->
                 <div>
                     <img id="mainImage" src="" alt="Product Image" class="w-full h-80 object-contain bg-white rounded-lg mb-4">
-                    <div id="thumbnailContainer" class="grid grid-cols-5 gap-2">
-                        <!-- Thumbnails will be generated here -->
-                    </div>
+                    <div id="thumbnailContainer" class="grid grid-cols-5 gap-2"></div>
                 </div>
-                <!-- Product Info -->
                 <div>
                     <h2 id="detailName" class="text-3xl font-koulen mb-2"></h2>
                     <p id="detailBrand" class="text-lg text-gray-500 mb-4"></p>
+                    <div class="mb-4">
+                        <h4 class="font-bold text-gray-800">ស្ថានភាព:</h4>
+                        <p id="detailStatus" class=""></p>
+                    </div>
                     <p id="detailPrice" class="text-3xl font-bold text-blue-600 mb-4"></p>
                     <div class="mb-4">
                         <h4 class="font-bold text-gray-800">ប្រភេទ:</h4>
@@ -308,6 +348,10 @@
                         <h4 class="font-bold text-gray-800">ការពិពណ៌នា:</h4>
                         <p id="detailDescription" class="text-gray-600 whitespace-pre-wrap"></p>
                     </div>
+                    <button id="shareBtn" class="mt-6 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" /></svg>
+                        <span>Share</span>
+                    </button>
                 </div>
             </div>
             <button id="closeDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
@@ -342,12 +386,10 @@
             set,
             push,
             remove,
-            update
+            update,
+            runTransaction
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         
-        // NOTE: Firebase Storage is NOT imported in this version.
-
-        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyDPxdjrcDZYGGHAZ2av3M2gjXSzdsAvXC4",
             authDomain: "j-tech-web-1b237.firebaseapp.com",
@@ -358,22 +400,22 @@
             appId: "1:589738658753:web:0b73c4b786196238b163a7" 
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // --- DOM Elements ---
         const notification = document.getElementById('notification');
         const productGrid = document.getElementById('productGrid');
-        const noProductsMessage = document.getElementById('noProductsMessage');
+        const paginationControls = document.getElementById('paginationControls');
         const searchInput = document.getElementById('searchInput');
         const categoryFilter = document.getElementById('categoryFilter');
         const brandFilter = document.getElementById('brandFilter');
         const priceFilter = document.getElementById('priceFilter');
+        const statusFilter = document.getElementById('statusFilter');
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const adminPanelBtn = document.getElementById('adminPanelBtn');
         const logoutBtn = document.getElementById('logoutBtn');
+        const resetAllViewsBtn = document.getElementById('resetAllViewsBtn');
         const loginModal = document.getElementById('loginModal');
         const adminModal = document.getElementById('adminModal');
         const productDetailModal = document.getElementById('productDetailModal');
@@ -387,19 +429,23 @@
         const productForm = document.getElementById('productForm');
         const categoryForm = document.getElementById('categoryForm');
         const newCategoryName = document.getElementById('newCategoryName');
-        const categoryList = document.getElementById('categoryList');
+        const existingCategories = document.getElementById('existingCategories');
+        const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
         const formTitle = document.getElementById('formTitle');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const resetViewBtn = document.getElementById('resetViewBtn');
         const imageInputsContainer = document.getElementById('imageInputsContainer');
         const addImageInputBtn = document.getElementById('addImageInputBtn');
+        const shareBtn = document.getElementById('shareBtn');
 
-        // --- Global State ---
         let allProducts = [];
         let allCategories = [];
         let currentUser = null;
         let editingProductId = null;
+        let currentPage = 1;
+        const productsPerPage = 25;
+        let currentDetailProductId = null;
 
-        // --- Helper Functions ---
         function showNotification(message, isError = false) {
             notification.textContent = message;
             notification.style.backgroundColor = isError ? '#ef4444' : '#22c55e';
@@ -407,19 +453,20 @@
             setTimeout(() => { notification.classList.remove('show'); }, 3000);
         }
 
-        // --- Authentication ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user && !user.isAnonymous) {
                 adminLoginBtn.classList.add('hidden');
                 adminPanelBtn.classList.remove('hidden');
                 logoutBtn.classList.remove('hidden');
+                resetAllViewsBtn.classList.remove('hidden');
             } else {
                 adminLoginBtn.classList.remove('hidden');
                 adminPanelBtn.classList.add('hidden');
                 logoutBtn.classList.add('hidden');
+                resetAllViewsBtn.classList.add('hidden');
             }
-            renderProducts(filterProducts());
+            applyFilters();
         });
 
         async function initializeAuth() {
@@ -432,38 +479,39 @@
             } catch (error) { console.error("Authentication failed:", error); }
         }
 
-        // --- Realtime Database Data Fetching ---
         const productsRef = ref(db, 'products');
         const categoriesRef = ref(db, 'categories');
 
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
             allProducts = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
-            renderProducts(filterProducts());
+            
+            const inStockCount = allProducts.filter(p => p.status === 'inStock' || !p.status).length;
+            const soldOutCount = allProducts.filter(p => p.status === 'soldOut').length;
+            const totalImportCount = allProducts.reduce((sum, p) => sum + (parseInt(p.importQty) || 0), 0);
+
+            document.getElementById('inStockCount').textContent = inStockCount;
+            document.getElementById('soldOutCount').textContent = soldOutCount;
+            document.getElementById('totalImportCount').textContent = totalImportCount;
+
+            applyFilters();
             populateFilters();
-        }, (error) => {
-            console.error("Firebase read failed (products): ", error);
-            showNotification("មិនអាចអានទិន្នន័យផលិតផលបានទេ។ សូមពិនិត្យ Database Rules។", true);
+            checkUrlForProduct();
         });
 
         onValue(categoriesRef, (snapshot) => {
             const data = snapshot.val();
             allCategories = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
             populateCategorySelects();
-            renderCategoryList();
-        }, (error) => {
-            console.error("Firebase read failed (categories): ", error);
-            showNotification("មិនអាចអានទិន្នន័យប្រភេទបានទេ។ សូមពិនិត្យ Database Rules។", true);
+            populateCategoryDropdown();
         });
 
-        // --- Rendering and Filtering ---
-        function renderProducts(products) {
+        function renderProducts(productsToRender) {
             productGrid.innerHTML = '';
-            noProductsMessage.classList.toggle('hidden', products.length > 0);
-
-            products.forEach(product => {
+            
+            productsToRender.forEach(product => {
                 const card = document.createElement('div');
-                card.className = 'product-card bg-white rounded-lg shadow-md overflow-hidden flex flex-col';
+                card.className = `product-card bg-white rounded-lg overflow-hidden flex flex-col ${product.status === 'soldOut' ? 'relative' : ''}`;
                 card.dataset.id = product.id;
 
                 const mainImage = (Array.isArray(product.imageUrls) && product.imageUrls.length > 0) 
@@ -471,23 +519,31 @@
                     : 'https://placehold.co/400x300/e2e8f0/64748b?text=No+Image';
 
                 card.innerHTML = `
-                    <div class="h-48 bg-white flex items-center justify-center">
-                        <img src="${mainImage}" alt="${product.name}" class="max-w-full max-h-full object-contain">
+                    <div class="h-48 bg-white flex items-center justify-center p-2 relative">
+                        <img src="${mainImage}" alt="${product.name}" class="max-w-full max-h-full object-contain ${product.status === 'soldOut' ? 'opacity-50' : ''}">
+                        ${product.status === 'soldOut' ? `<div class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-30 flex items-center justify-center"><span class="text-red-500 font-bold text-xl font-koulen transform -rotate-12 border-2 border-red-500 p-2 rounded bg-white bg-opacity-75">អស់ពីស្តុក</span></div>` : ''}
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
                         <h3 class="text-lg font-bold text-gray-800 truncate">${product.name}</h3>
                         <p class="text-sm text-gray-500">${product.brand}</p>
-                        <p class="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 self-start my-2">${product.category || 'N/A'}</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <p class="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 self-start">${product.category || 'N/A'}</p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                                <span>${product.views || 0}</span>
+                            </div>
+                        </div>
                         <div class="flex-grow"></div>
                         <div class="flex justify-between items-center mt-4">
                             <p class="text-xl font-koulen text-blue-600">$${product.price}</p>
-                            ${(currentUser && !currentUser.isAnonymous) ? `
-                            <div class="flex space-x-2">
+                            <span class="text-xs font-bold ${product.status === 'soldOut' ? 'text-red-500' : 'text-green-500'}">${product.status === 'soldOut' ? 'អស់ស្តុក' : 'មានស្តុក'}</span>
+                        </div>
+                         ${(currentUser && !currentUser.isAnonymous) ? `
+                            <div class="flex space-x-2 mt-2 self-end">
                                 <button data-id="${product.id}" class="edit-btn bg-yellow-400 hover:bg-yellow-500 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center">✏️</button>
                                 <button data-id="${product.id}" class="delete-btn bg-red-500 hover:bg-red-600 text-white p-2 rounded-full w-8 h-8 flex items-center justify-center">🗑️</button>
                             </div>
-                            ` : ''}
-                        </div>
+                        ` : ''}
                     </div>
                 `;
                 productGrid.appendChild(card);
@@ -503,27 +559,40 @@
             const category = categoryFilter.value;
             const brand = brandFilter.value;
             const price = priceFilter.value;
+            const status = statusFilter.value;
+            let filtered = [...allProducts];
 
-            return allProducts.filter(p => {
-                if (!p) return false;
-
-                if (price) {
+            if (status) {
+                 if (status === 'inStock') {
+                    filtered = filtered.filter(p => p.status === 'inStock' || !p.status);
+                } else if (status === 'soldOut') {
+                    filtered = filtered.filter(p => p.status === 'soldOut');
+                }
+            }
+            if (price) {
+                filtered = filtered.filter(p => {
                     const productPrice = parseFloat(p.price);
                     if (isNaN(productPrice)) return false; 
                     if (price === '<100' && productPrice >= 100) return false;
                     if (price === '100-300' && (productPrice < 100 || productPrice > 300)) return false;
                     if (price === '>300' && productPrice <= 300) return false;
-                }
-                if (category && p.category !== category) return false;
-                if (brand && p.brand !== brand) return false;
-                if (searchTerm) {
-                    const inName = p.name && p.name.toLowerCase().includes(searchTerm);
-                    const inBrand = p.brand && p.brand.toLowerCase().includes(searchTerm);
-                    const inDescription = p.description && p.description.toLowerCase().includes(searchTerm);
-                    if (!inName && !inBrand && !inDescription) return false;
-                }
-                return true;
-            });
+                    return true;
+                });
+            }
+            if (category) {
+                filtered = filtered.filter(p => p.category === category);
+            }
+            if (brand) {
+                filtered = filtered.filter(p => p.brand === brand);
+            }
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                    (p.brand && p.brand.toLowerCase().includes(searchTerm)) ||
+                    (p.description && p.description.toLowerCase().includes(searchTerm))
+                );
+            }
+            return filtered;
         }
         
         function populateFilters() {
@@ -543,34 +612,80 @@
             document.getElementById('productCategory').innerHTML = optionsHTML;
         }
 
-        function renderCategoryList() {
-            categoryList.innerHTML = '';
-            allCategories
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .forEach(cat => {
-                    const el = document.createElement('div');
-                    el.className = 'flex justify-between items-center bg-white p-2 rounded-lg';
-                    el.innerHTML = `
-                        <span>${cat.name}</span>
-                        <button data-id="${cat.id}" class="delete-category-btn text-red-500 hover:text-red-700">🗑️</button>
-                    `;
-                    categoryList.appendChild(el);
-                });
-            document.querySelectorAll('.delete-category-btn').forEach(btn => btn.addEventListener('click', handleDeleteCategory));
+        function populateCategoryDropdown() {
+            existingCategories.innerHTML = '';
+            allCategories.sort((a, b) => a.name.localeCompare(b.name)).forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                existingCategories.appendChild(option);
+            });
+        }
+
+        function renderPagination(totalItems) {
+            paginationControls.innerHTML = '';
+            const totalPages = Math.ceil(totalItems / productsPerPage);
+            if (totalPages <= 1) return;
+
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'ទំព័រមុន';
+            prevButton.className = 'pagination-btn px-4 py-2 bg-white border rounded-lg hover:bg-gray-100';
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    applyFilters();
+                }
+            };
+            paginationControls.appendChild(prevButton);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = `pagination-btn px-4 py-2 border rounded-lg hover:bg-gray-100 ${currentPage === i ? 'active' : 'bg-white'}`;
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    applyFilters();
+                };
+                paginationControls.appendChild(pageButton);
+            }
+
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'ទំព័របន្ទាប់';
+            nextButton.className = 'pagination-btn px-4 py-2 bg-white border rounded-lg hover:bg-gray-100';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    applyFilters();
+                }
+            };
+            paginationControls.appendChild(nextButton);
         }
 
         function applyFilters() { 
-            const filtered = filterProducts();
-            renderProducts(filtered);
+            let filtered = filterProducts();
+            filtered.sort((a, b) => {
+                const statusA = a.status === 'soldOut' ? 1 : 0;
+                const statusB = b.status === 'soldOut' ? 1 : 0;
+                if (statusA !== statusB) {
+                    return statusA - statusB;
+                }
+                return (b.views || 0) - (a.views || 0);
+            });
+            
+            const startIndex = (currentPage - 1) * productsPerPage;
+            const endIndex = startIndex + productsPerPage;
+            const paginatedProducts = filtered.slice(startIndex, endIndex);
+
+            renderProducts(paginatedProducts);
+            renderPagination(filtered.length);
         }
         
-        [searchInput, categoryFilter, brandFilter, priceFilter].forEach(el => {
-            el.addEventListener('input', applyFilters);
-            el.addEventListener('change', applyFilters);
+        [searchInput, categoryFilter, brandFilter, priceFilter, statusFilter].forEach(el => {
+            el.addEventListener('input', () => { currentPage = 1; applyFilters(); });
+            el.addEventListener('change', () => { currentPage = 1; applyFilters(); });
         });
-
-
-        // --- Modal & Form Logic ---
 
         adminLoginBtn.addEventListener('click', () => { loginModal.style.display = 'flex'; });
         closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
@@ -581,7 +696,6 @@
         
         window.addEventListener('click', (e) => {
             if (e.target === loginModal) loginModal.style.display = 'none';
-            if (e.target === adminModal) adminModal.style.display = 'none';
             if (e.target === productDetailModal) productDetailModal.style.display = 'none';
             if (e.target === imageZoomModal) imageZoomModal.style.display = 'none';
         });
@@ -589,6 +703,12 @@
         function handleProductClick(e) {
             if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) { return; }
             const productId = e.currentTarget.dataset.id;
+            
+            const productRef = ref(db, `products/${productId}/views`);
+            runTransaction(productRef, (currentViews) => {
+                return (currentViews || 0) + 1;
+            });
+
             showProductDetails(productId);
         }
 
@@ -600,12 +720,23 @@
         function showProductDetails(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (!product) return;
+            
+            currentDetailProductId = productId; // Store current product ID for sharing
 
             document.getElementById('detailName').textContent = product.name;
             document.getElementById('detailBrand').textContent = product.brand;
             document.getElementById('detailPrice').textContent = `$${product.price}`;
             document.getElementById('detailCategory').textContent = product.category;
             document.getElementById('detailDescription').textContent = product.description;
+
+            const detailStatusEl = document.getElementById('detailStatus');
+            if (product.status === 'soldOut') {
+                detailStatusEl.textContent = 'អស់ពីស្តុក';
+                detailStatusEl.className = 'text-red-500 font-bold';
+            } else {
+                detailStatusEl.textContent = 'មានក្នុងស្តុក';
+                detailStatusEl.className = 'text-green-500 font-bold';
+            }
 
             const mainImageEl = document.getElementById('mainImage');
             const thumbnailContainer = document.getElementById('thumbnailContainer');
@@ -668,18 +799,14 @@
         function addImageInput(value = '') {
             const div = document.createElement('div');
             div.className = 'flex items-center space-x-2';
-            div.innerHTML = `
-                <input type="text" class="image-url-input w-full p-2 border rounded-lg" placeholder="បិទភ្ជាប់ URL ពី ImgBB..." value="${value}">
-                <button type="button" class="remove-url-btn bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold">X</button>
-            `;
+            div.innerHTML = `<input type="text" class="image-url-input w-full p-2 border rounded-lg" placeholder="បិទភ្ជាប់ URL ពី ImgBB..." value="${value}"><button type="button" class="remove-url-btn bg-red-500 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold">X</button>`;
             div.querySelector('.remove-url-btn').addEventListener('click', () => div.remove());
             imageInputsContainer.appendChild(div);
         }
 
         productForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const imageUrls = Array.from(document.querySelectorAll('.image-url-input'))
-                                   .map(input => input.value.trim()).filter(url => url);
+            const imageUrls = Array.from(document.querySelectorAll('.image-url-input')).map(input => input.value.trim()).filter(url => url);
             if (imageUrls.length === 0) {
                 showNotification("សូមបញ្ចូល URL រូបភាពយ៉ាងតិចមួយ។", true);
                 return;
@@ -689,14 +816,19 @@
                 brand: document.getElementById('productBrand').value,
                 category: document.getElementById('productCategory').value,
                 price: parseFloat(document.getElementById('productPrice').value),
+                importQty: parseInt(document.getElementById('productImportQty').value) || 0,
                 description: document.getElementById('productDescription').value,
+                status: document.getElementById('productStatus').value,
                 imageUrls: imageUrls
             };
             try {
                 if (editingProductId) {
+                    const currentProduct = allProducts.find(p => p.id === editingProductId);
+                    productData.views = currentProduct.views || 0;
                     await update(ref(db, `products/${editingProductId}`), productData);
                     showNotification('កែប្រែផលិតផលបានជោគជ័យ!');
                 } else {
+                    productData.views = 0;
                     await set(push(productsRef), productData);
                     showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
                 }
@@ -723,23 +855,30 @@
 
         function handleEditProduct(e) {
             e.stopPropagation();
-            editingProductId = e.target.closest('button').dataset.id;
-            const product = allProducts.find(p => p.id === editingProductId);
+            const id = e.target.closest('button').dataset.id;
+            const product = allProducts.find(p => p.id === id);
             if (product) {
                 resetProductForm();
+                editingProductId = id; 
                 document.getElementById('productId').value = product.id;
                 document.getElementById('productName').value = product.name;
                 document.getElementById('productBrand').value = product.brand;
                 document.getElementById('productCategory').value = product.category;
                 document.getElementById('productPrice').value = product.price;
+                document.getElementById('productImportQty').value = product.importQty || 1;
                 document.getElementById('productDescription').value = product.description;
-
+                document.getElementById('productStatus').value = product.status || 'inStock';
+                
+                imageInputsContainer.innerHTML = ''; 
                 if (Array.isArray(product.imageUrls)) {
                     product.imageUrls.forEach(url => addImageInput(url));
+                } else {
+                    addImageInput(); 
                 }
 
                 formTitle.textContent = 'កែប្រែផលិតផល';
                 cancelEditBtn.classList.remove('hidden');
+                resetViewBtn.classList.remove('hidden');
                 adminModal.style.display = 'flex';
                 productForm.scrollIntoView({ behavior: 'smooth' });
             }
@@ -755,16 +894,19 @@
                 } catch (error) { showNotification('មានបញ្ហាក្នុងការលុបផលិតផល។', true); }
             }
         }
-
-        async function handleDeleteCategory(e) {
-            const id = e.target.closest('button').dataset.id;
-            if (confirm('តើអ្នកពិតជាចង់លុបប្រភេទនេះមែនទេ?')) {
-                try {
-                    await remove(ref(db, `categories/${id}`));
-                    showNotification('ប្រភេទត្រូវបានលុប។', true);
-                } catch (error) { showNotification('មានបញ្ហាក្នុងការលុបប្រភេទ។', true); }
+        
+        deleteCategoryBtn.addEventListener('click', () => {
+            const categoryId = existingCategories.value;
+            if (!categoryId) {
+                showNotification('សូមជ្រើសរើសប្រភេទដើម្បីលុប។', true);
+                return;
             }
-        }
+            if (confirm('តើអ្នកពិតជាចង់លុបប្រភេទនេះមែនទេ?')) {
+                remove(ref(db, `categories/${categoryId}`))
+                    .then(() => showNotification('ប្រភេទត្រូវបានលុប។', true))
+                    .catch(() => showNotification('មានបញ្ហាក្នុងការលុបប្រភេទ។', true));
+            }
+        });
         
         function resetProductForm() {
             productForm.reset();
@@ -773,11 +915,81 @@
             editingProductId = null;
             formTitle.textContent = 'បន្ថែម/កែប្រែផលិតផល';
             cancelEditBtn.classList.add('hidden');
+            resetViewBtn.classList.add('hidden');
         }
 
         cancelEditBtn.addEventListener('click', resetProductForm);
 
-        // --- Initial Load ---
+        resetViewBtn.addEventListener('click', async () => {
+            if (!editingProductId) return;
+            if (confirm('តើអ្នកពិតជាចង់ Reset ចំនួនអ្នកមើលរបស់ផលិតផលនេះមែនទេ?')) {
+                const productViewRef = ref(db, `products/${editingProductId}/views`);
+                try {
+                    await set(productViewRef, 0);
+                    showNotification('Reset ចំនួនអ្នកមើលបានជោគជ័យ!');
+                } catch (error) {
+                    showNotification('មានបញ្ហាក្នុងការ Reset។', true);
+                }
+            }
+        });
+
+        resetAllViewsBtn.addEventListener('click', async () => {
+            if (confirm('តើអ្នកពិតជាចង់ Reset ចំនួនអ្នកមើលរបស់ផលិតផលទាំងអស់មែនទេ?')) {
+                const updates = {};
+                allProducts.forEach(p => {
+                    updates[`/products/${p.id}/views`] = 0;
+                });
+                try {
+                    await update(ref(db), updates);
+                    showNotification('Reset ចំនួនអ្នកមើលទាំងអស់បានជោគជ័យ!');
+                } catch (error) {
+                    showNotification('មានបញ្ហាក្នុងការ Reset។', true);
+                }
+            }
+        });
+
+        // Share Functionality
+        shareBtn.addEventListener('click', async () => {
+            if (!currentDetailProductId) return;
+            const product = allProducts.find(p => p.id === currentDetailProductId);
+            if (!product) return;
+
+            const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+            const shareData = {
+                title: product.name,
+                text: `${product.name} - តម្លៃ $${product.price} នៅ J-Tech Cambodia`,
+                url: shareUrl,
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    // Fallback for desktop: copy to clipboard
+                    const dummy = document.createElement('textarea');
+                    document.body.appendChild(dummy);
+                    dummy.value = shareUrl;
+                    dummy.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(dummy);
+                    showNotification('បានចម្លងតំណ!');
+                }
+            } catch (err) {
+                console.error("Share failed:", err);
+            }
+        });
+
+        function checkUrlForProduct() {
+            const params = new URLSearchParams(window.location.search);
+            const productId = params.get('product');
+            if (productId && allProducts.length > 0) {
+                const productExists = allProducts.some(p => p.id === productId);
+                if (productExists) {
+                    showProductDetails(productId);
+                }
+            }
+        }
+
         async function main() {
             await initializeAuth();
             resetProductForm();
