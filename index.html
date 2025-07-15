@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J-Tech Cambodia - ហាងលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចពីជប៉ុន</title>
-    <link rel="icon" type="image/png" href="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png">
+    <title id="pageTitle">J-Tech Cambodia</title>
+    <link id="favicon" rel="icon" type="image/png" href="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -37,8 +37,8 @@
             max-width: 500px;
             animation: fadeIn 0.3s;
         }
-        #productDetailModal .modal-content {
-            max-width: 800px;
+        #productDetailModal .modal-content, #adminModal .modal-content, #pageSetupModal .modal-content, #postDetailModal .modal-content, #postAndSlideModal .modal-content {
+            max-width: 1000px;
         }
         #imageZoomModal {
             background-color: rgba(0,0,0,0.85);
@@ -46,6 +46,14 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideInFromRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes slideInFromLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
         }
         .product-card {
             cursor: pointer;
@@ -99,55 +107,157 @@
             position: relative;
             overflow: hidden;
             border-radius: 0.5rem;
+            background: white;
+            height: 350px; /* Adjusted height */
         }
         .slide {
             display: none;
+            position: absolute;
             width: 100%;
-            animation: fadeIn 0.7s ease-in-out;
+            height: 100%;
+            cursor: pointer;
+        }
+        .slide.active {
+            display: flex;
+            animation-duration: 0.6s;
+            animation-timing-function: ease-in-out;
+            animation-fill-mode: both;
+        }
+        .slide.slide-in-right {
+            animation-name: slideInFromRight;
+        }
+        .slide.slide-in-left {
+            animation-name: slideInFromLeft;
+        }
+        .slide-content-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            padding: 2rem;
         }
         .slide-text-container {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease-out 0.3s, transform 0.5s ease-out 0.3s;
+            flex: 1;
+            padding-left: 5rem;
+            padding-right: 5rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .slide.active .slide-text-container {
-            opacity: 1;
-            transform: translateY(0);
+        .slide-image-container {
+            flex: 1;
+            height: 100%;
         }
-        .slide-dot {
+        .slide-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+        
+        .slide-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0,0,0,0.3);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
             cursor: pointer;
-            height: 12px;
-            width: 12px;
-            margin: 0 4px;
-            background-color: #bbb;
-            border-radius: 50%;
-            display: inline-block;
-            transition: background-color 0.6s ease;
+            z-index: 10;
         }
-        .slide-dot.active, .slide-dot:hover {
-            background-color: #717171;
+        .slide-nav:hover {
+            background-color: rgba(0,0,0,0.6);
         }
-        .slide-image {
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        #prevSlide { left: 1rem; }
+        #nextSlide { right: 1rem; }
+        
+        .placeholder {
+            color: #a0aec0; /* gray-500 */
+            font-style: italic;
+        }
+        .placeholder-light {
+            color: #d1d5db; /* gray-300 */
+            font-style: italic;
+            opacity: 0.8;
+        }
+        /* Horizontal Scroll Container */
+        .scroll-container {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 1rem; /* Space for scrollbar */
+        }
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .scroll-container .product-card {
+            width: calc(100% / 2.5); /* Show ~2.5 cards on mobile */
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .scroll-container .product-card {
+                width: calc(100% / 3.5); /* sm */
+            }
+            .slide-content-wrapper {
+                flex-direction: row;
+            }
+            .slide-text-container {
+                padding-right: 2rem;
+                text-align: left;
+            }
+        }
+        @media (min-width: 768px) {
+            .scroll-container .product-card {
+                width: calc(100% / 4.5); /* md */
+            }
+        }
+        @media (min-width: 1024px) {
+            .scroll-container .product-card {
+                width: calc(100% / 6.5); /* lg */
+            }
         }
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100" style="visibility: hidden;">
 
     <!-- Header -->
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0 flex items-center space-x-3">
-                    <img src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-TECH Logo" class="h-10">
-                    <a href="#" class="text-xl md:text-2xl text-blue-600 font-koulen">J-TECH CAMBODIA</a>
+                    <img id="headerLogo" src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-TECH Logo" class="h-10">
+                    <a href="#" id="headerShopName" class="text-xl md:text-2xl text-blue-600 font-koulen">J-TECH CAMBODIA</a>
                 </div>
-                <div class="hidden md:flex items-center space-x-4">
-                    <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-4">
+                    <div id="auth-header-section" class="flex items-center space-x-2">
+                        <button id="adminLoginBtn" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">Admin Login</button>
+                        <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">គ្រប់គ្រងផលិតផល</button>
+                        <button id="postAndSlideManageBtn" class="hidden bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">គ្រប់គ្រង Post & ស្លាយ</button>
+                        <button id="pageSetupBtn" class="hidden bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">Page Setup</button>
+                        <button id="resetAllViewsBtn" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">Reset Views</button>
+                        <button id="adminLogoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">ចាកចេញ</button>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                         </svg>
-                        <span class="font-semibold text-gray-700 text-sm">097 244 4424 / 096 717 212</span>
+                        <span id="headerPhone" class="font-semibold text-gray-700 text-sm">097 244 4424 / 096 717 212</span>
                     </div>
                 </div>
             </div>
@@ -159,8 +269,8 @@
         
         <section class="hero-banner text-white rounded-lg shadow-lg p-6 md:p-8 mb-8 flex items-center">
             <div class="w-full md:w-2/3">
-                <h2 class="text-2xl md:text-4xl font-koulen mb-3">J-TECH CAMBODIA ផលិតផលគុណភាពពីជប៉ុន</h2>
-                <p class="mb-5 text-sm md:text-base">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
+                <h2 id="bannerTagline" class="text-2xl md:text-4xl font-koulen mb-3">J-TECH CAMBODIA ផលិតផលគុណភាពពីជប៉ុន</h2>
+                <p id="bannerDescription" class="mb-5 text-sm md:text-base">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
                     <a href="#productGrid" class="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg hover:bg-gray-200 transition duration-300 text-sm">មើលផលិតផលទាំងអស់</a>
                     <div class="text-white text-sm">
@@ -171,25 +281,22 @@
                 </div>
             </div>
             <div class="hidden md:block w-1/3 text-center">
-                 <img src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-Tech Product" class="mx-auto rounded-lg h-32">
+                 <img id="bannerLogo" src="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png" alt="J-Tech Product" class="mx-auto rounded-lg h-32">
             </div>
         </section>
         
         <!-- Slideshow Section -->
-        <div class="mb-8">
-            <div id="slideshowContainer" class="slideshow-container w-full h-64 md:h-80 bg-white">
-                <!-- Slides will be injected here -->
-            </div>
-            <div id="slide-dots" class="text-center p-4"></div>
+        <div id="slideshowContainer" class="slideshow-container mb-8">
+            <!-- Slides will be injected here by JS -->
         </div>
 
         <!-- Featured Sections -->
-        <div id="featured-sections" class="space-y-12 mb-12">
+        <div id="featured-sections" class="space-y-8 mb-4">
             <!-- New Arrivals and Popular sections will be generated here -->
         </div>
 
         <!-- Filters -->
-        <div class="bg-white p-4 rounded-lg shadow-md mb-8">
+        <div class="bg-white p-4 rounded-lg shadow-md mb-4">
             <h3 class="text-xl font-koulen mb-4">ស្វែងរកផលិតផល</h3>
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 <input id="searchInput" type="text" placeholder="វាយឈ្មោះ ឬលេខកូដ..." class="col-span-2 lg:col-span-1 p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -214,43 +321,37 @@
         </div>
 
         <!-- Product Grid -->
-        <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
             <!-- Product cards will be inserted here by JavaScript -->
         </div>
         
         <!-- Pagination Controls -->
-        <div id="paginationControls" class="mt-10 flex justify-center items-center space-x-2"></div>
+        <div id="paginationControls" class="mt-6 flex justify-center items-center space-x-2"></div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-12">
+    <footer class="bg-gray-800 text-white mt-8">
         <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div>
-                    <h3 class="font-koulen text-2xl mb-4">J-TECH CAMBODIA</h3>
-                    <p class="text-gray-400">នាំចូល និងចែកចាយផលិតផល IT មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
+                    <h3 id="footerShopName" class="font-koulen text-2xl mb-4">J-TECH CAMBODIA</h3>
+                    <p id="footerDescription" class="text-gray-400">នាំចូល និងចែកចាយផលិតផល IT មួយទឹកពីប្រទេសជប៉ុន ដែលមានគុណភាព និងតម្លៃសមរម្យ។</p>
                      <p class="text-gray-300 mt-4 flex items-start space-x-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mt-1 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                        <span>ផ្លូវលំទី៣ នៃផ្លូវ 371 ក្បែរផ្សារ 2002</span>
+                        <span id="footerAddress">ផ្លូវលំទី៣ នៃផ្លូវ 371 ក្បែរផ្សារ 2002</span>
                     </p>
-                    <div id="auth-footer-section" class="mt-4">
-                        <button id="adminLoginBtn" class="text-blue-400 hover:text-blue-300 text-sm">Admin Login</button>
-                        <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">ផ្ទាំងបញ្ជា</button>
-                        <button id="resetAllViewsBtn" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">Reset All Views</button>
-                        <button id="adminLogoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm ml-2">ចាកចេញ (Admin)</button>
-                    </div>
                 </div>
                 <div>
                     <h3 class="font-koulen text-xl mb-4">ទំនាក់ទំនង</h3>
                     <ul class="space-y-3 text-gray-300">
                         <li class="flex items-center space-x-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2.153a1 1 0 01-.986-.836l-.74-4.435a1 1 0 01.54-1.06l1.548-.773a11.037 11.037 0 00-6.105-6.105l-.774 1.548a1 1 0 01-1.06.54l-4.435-.74A1 1 0 012 4.153V3z" /></svg>
-                            <span>097 244 4424 / 096 717 212</span>
+                            <span id="footerPhone">097 244 4424 / 096 717 212</span>
                         </li>
                         <li class="flex items-center space-x-3">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
-                            <a href="https://t.me/lazytospeak" target="_blank" class="hover:text-blue-400 transition">Telegram Channel</a>
+                            <a id="footerTelegram" href="https://t.me/lazytospeak" target="_blank" class="hover:text-blue-400 transition">Telegram Channel</a>
                         </li>
                     </ul>
                      <div class="mt-4">
@@ -259,13 +360,13 @@
                 </div>
                 <div>
                     <h3 class="font-koulen text-xl mb-4">ផែនទី និងតាមដានពួកយើង</h3>
-                     <a href="https://www.facebook.com/J-TECH-Cambodia" target="_blank" class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition">
+                     <a id="footerFacebook" href="https://www.facebook.com/J-TECH-Cambodia" target="_blank" class="flex items-center space-x-3 text-gray-300 hover:text-blue-400 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z" clip-rule="evenodd" /></svg>
-                        <span>J-TECH Cambodia</span>
+                        <span id="footerFacebookName">J-TECH Cambodia</span>
                     </a>
                     <div class="mt-4">
-                        <a href="https://maps.app.goo.gl/JASuZyWud8ckqWPG6" target="_blank">
-                            <img src="https://i.ibb.co/dwdCfQLc/jtechmaps.jpg" alt="J-TECH Cambodia Map" class="rounded-lg hover:opacity-80 transition-opacity duration-300">
+                        <a id="footerGmaps" href="https://maps.app.goo.gl/JASuZyWud8ckqWPG6" target="_blank">
+                            <img id="footerGmapsImage" src="https://i.ibb.co/dwdCfQLc/jtechmaps.jpg" alt="J-TECH Cambodia Map" class="rounded-lg hover:opacity-80 transition-opacity duration-300">
                         </a>
                     </div>
                 </div>
@@ -303,7 +404,7 @@
     <!-- Admin Panel Modal -->
     <div id="adminModal" class="modal">
         <div class="modal-content max-w-4xl">
-            <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រង</h2>
+            <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រងផលិតផល</h2>
             
             <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
                 <h3 id="formTitle" class="text-xl font-koulen mb-4">គ្រប់គ្រងផលិតផល</h3>
@@ -325,11 +426,18 @@
                         <label class="block text-gray-700">ប្រភេទ</label>
                         <select id="productCategory" class="w-full p-2 border rounded-lg" required></select>
                     </div>
+                     <div>
+                        <label class="block text-gray-700">គុណភាព</label>
+                        <select id="productQuality" class="w-full p-2 border rounded-lg" required>
+                            <option value="មួយទឹក">មួយទឹក</option>
+                            <option value="ថ្មី">ថ្មី</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-gray-700">តម្លៃ ($)</label>
                         <input type="number" id="productPrice" class="w-full p-2 border rounded-lg" required>
                     </div>
-                     <div>
+                     <div class="md:col-span-2">
                         <label class="block text-gray-700">ចំនួននាំចូល</label>
                         <input type="number" id="productImportQty" class="w-full p-2 border rounded-lg" value="1" required>
                     </div>
@@ -372,25 +480,50 @@
                 </div>
             </div>
 
-            <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
-                <h3 class="text-xl font-koulen mb-4">គ្រប់គ្រងស្លាយ</h3>
-                <form id="slideForm" class="space-y-4">
-                    <input type="hidden" id="slideId">
-                    <div>
-                        <label class="block text-gray-700">URL រូបភាពស្លាយ</label>
-                        <input type="text" id="slideImageUrl" class="w-full p-2 border rounded-lg" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700">អត្ថបទស្លាយ</label>
-                        <textarea id="slideText" rows="2" class="w-full p-2 border rounded-lg" required></textarea>
-                    </div>
-                    <button type="submit" id="slideSubmitBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">បន្ថែមស្លាយ</button>
-                </form>
-                <div id="slideList" class="mt-4 space-y-2"></div>
-            </div>
-
             <div class="flex justify-end mt-6">
                 <button type="button" id="closeAdminModal" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">បិទផ្ទាំងបញ្ជា</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Post and Slide Management Modal -->
+    <div id="postAndSlideModal" class="modal">
+        <div class="modal-content">
+             <h2 class="text-2xl font-koulen mb-6 text-center">គ្រប់គ្រង Post និង Slideshow</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Post Management Section -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-koulen mb-4">គ្រប់គ្រង Post</h3>
+                    <form id="postForm" class="space-y-4">
+                        <input type="hidden" id="postId">
+                        <div>
+                            <label class="block text-gray-700">ចំណងជើង Post</label>
+                            <input type="text" id="postTitle" class="w-full p-2 border rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700">URL រូបភាព</label>
+                            <input type="text" id="postImageUrl" class="w-full p-2 border rounded-lg" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700">អត្ថបទ</label>
+                            <textarea id="postContent" rows="4" class="w-full p-2 border rounded-lg" required></textarea>
+                        </div>
+                        <button type="submit" id="postSubmitBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">បន្ថែម Post</button>
+                    </form>
+                    <div id="postList" class="mt-4 space-y-2 max-h-64 overflow-y-auto"></div>
+                </div>
+
+                <!-- Slide Configuration Section -->
+                <div class="bg-gray-50 p-6 rounded-lg shadow-inner">
+                     <h3 class="text-xl font-koulen mb-4">កំណត់ Slideshow</h3>
+                     <form id="slideConfigForm" class="space-y-4">
+                        <!-- Dropdowns will be generated here -->
+                     </form>
+                     <button id="saveSlideConfigBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">រក្សាទុកការកំណត់ស្លាយ</button>
+                </div>
+             </div>
+             <div class="flex justify-end mt-6">
+                <button type="button" id="closePostAndSlideModal" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">បិទ</button>
             </div>
         </div>
     </div>
@@ -411,6 +544,10 @@
                         <h4 class="font-bold text-gray-800">ស្ថានភាព:</h4>
                         <p id="detailStatus" class=""></p>
                     </div>
+                     <div class="mb-4">
+                        <h4 class="font-bold text-gray-800">គុណភាព:</h4>
+                        <p id="detailQuality" class="font-semibold"></p>
+                    </div>
                     <p id="detailPrice" class="text-3xl font-bold text-red-600 mb-4"></p>
                     <div class="mb-4">
                         <h4 class="font-bold text-gray-800">ប្រភេទ:</h4>
@@ -429,11 +566,100 @@
             <button id="closeDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
         </div>
     </div>
+    
+    <!-- Post Detail Modal -->
+    <div id="postDetailModal" class="modal">
+        <div class="modal-content relative">
+             <button id="closePostDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl z-10">&times;</button>
+             <div class="max-h-[80vh] overflow-y-auto">
+                <img id="postDetailImage" src="" alt="Post Image" class="w-full h-64 object-cover rounded-t-lg mb-4">
+                <div class="p-4">
+                    <h2 id="postDetailTitle" class="text-3xl font-koulen mb-2"></h2>
+                    <p id="postDetailDate" class="text-gray-500 text-sm mb-4"></p>
+                    <div id="postDetailContent" class="text-gray-700 whitespace-pre-wrap"></div>
+                </div>
+             </div>
+        </div>
+    </div>
 
     <!-- Image Zoom Modal -->
     <div id="imageZoomModal" class="modal">
         <span id="closeZoomModal" class="absolute top-5 right-8 text-white text-5xl font-bold cursor-pointer hover:text-gray-300">&times;</span>
         <img class="m-auto max-w-[90%] max-h-[90%] rounded-lg" id="zoomedImage">
+    </div>
+
+    <!-- Page Setup Modal -->
+    <div id="pageSetupModal" class="modal">
+        <div class="modal-content">
+            <h2 class="text-2xl font-koulen mb-6 text-center">កំណត់ค่าគេហទំព័រ</h2>
+            <form id="pageSetupForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="siteName" class="block text-gray-700 font-semibold">ឈ្មោះគេហទំព័រ (Title & Header)</label>
+                        <input type="text" id="siteName" class="w-full p-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-gray-700 font-semibold">លេខទូរស័ព្ទ (Header & Footer)</label>
+                        <input type="text" id="phone" class="w-full p-2 border rounded-lg">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="faviconUrl" class="block text-gray-700 font-semibold">URL រូប Favicon</label>
+                        <input type="text" id="faviconUrl" class="w-full p-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label for="logoUrl" class="block text-gray-700 font-semibold">URL រូប Logo (Header & Banner)</label>
+                        <input type="text" id="logoUrl" class="w-full p-2 border rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label for="heroTitle" class="block text-gray-700 font-semibold">ចំណងជើង Hero Banner</label>
+                    <input type="text" id="heroTitle" class="w-full p-2 border rounded-lg">
+                </div>
+                <div>
+                    <label for="heroDesc" class="block text-gray-700 font-semibold">សេចក្តីអធិប្បាយ Hero Banner</label>
+                    <textarea id="heroDesc" rows="2" class="w-full p-2 border rounded-lg"></textarea>
+                </div>
+                <div>
+                    <label for="footerDesc" class="block text-gray-700 font-semibold">សេចក្តីអធិប្បាយ Footer</label>
+                    <textarea id="footerDesc" rows="2" class="w-full p-2 border rounded-lg"></textarea>
+                </div>
+                 <div>
+                    <label for="address" class="block text-gray-700 font-semibold">អាស័យដ្ឋាន</label>
+                    <input type="text" id="address" class="w-full p-2 border rounded-lg">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div>
+                        <label for="facebookName" class="block text-gray-700 font-semibold">ឈ្មោះ Facebook Page</label>
+                        <input type="text" id="facebookName" class="w-full p-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label for="facebookLink" class="block text-gray-700 font-semibold">Link Facebook Page</label>
+                        <input type="text" id="facebookLink" class="w-full p-2 border rounded-lg">
+                    </div>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="telegramLink" class="block text-gray-700 font-semibold">Link Telegram</label>
+                        <input type="text" id="telegramLink" class="w-full p-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label for="gmapsLink" class="block text-gray-700 font-semibold">Link Google Maps</label>
+                        <input type="text" id="gmapsLink" class="w-full p-2 border rounded-lg">
+                    </div>
+                </div>
+                <div>
+                    <label for="gmapsImageUrl" class="block text-gray-700 font-semibold">URL រូបភាពផែនទី</label>
+                    <input type="text" id="gmapsImageUrl" class="w-full p-2 border rounded-lg">
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="closePageSetupModal" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg">បោះបង់</button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">រក្សាទុកការផ្លាស់ប្តូរ</button>
+                </div>
+            </form>
+        </div>
     </div>
 
 
@@ -459,7 +685,9 @@
             push,
             remove,
             update,
-            runTransaction
+            get,
+            runTransaction,
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         
         const firebaseConfig = {
@@ -476,6 +704,7 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
+        // DOM Elements
         const notification = document.getElementById('notification');
         const productGrid = document.getElementById('productGrid');
         const paginationControls = document.getElementById('paginationControls');
@@ -484,22 +713,43 @@
         const brandFilter = document.getElementById('brandFilter');
         const priceFilter = document.getElementById('priceFilter');
         const statusFilter = document.getElementById('statusFilter');
+        
+        // Auth Buttons
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const adminPanelBtn = document.getElementById('adminPanelBtn');
+        const postAndSlideManageBtn = document.getElementById('postAndSlideManageBtn');
         const adminLogoutBtn = document.getElementById('adminLogoutBtn');
         const resetAllViewsBtn = document.getElementById('resetAllViewsBtn');
+        const pageSetupBtn = document.getElementById('pageSetupBtn');
+
+        // Modals
         const loginModal = document.getElementById('loginModal');
         const adminModal = document.getElementById('adminModal');
+        const postAndSlideModal = document.getElementById('postAndSlideModal');
         const productDetailModal = document.getElementById('productDetailModal');
+        const postDetailModal = document.getElementById('postDetailModal');
         const imageZoomModal = document.getElementById('imageZoomModal');
+        const pageSetupModal = document.getElementById('pageSetupModal');
+
+        // Modal Close Buttons
         const closeLoginModal = document.getElementById('closeLoginModal');
         const closeAdminModal = document.getElementById('closeAdminModal');
+        const closePostAndSlideModal = document.getElementById('closePostAndSlideModal');
         const closeDetailModal = document.getElementById('closeDetailModal');
+        const closePostDetailModal = document.getElementById('closePostDetailModal');
         const closeZoomModal = document.getElementById('closeZoomModal');
+        const closePageSetupModal = document.getElementById('closePageSetupModal');
+
+        // Forms
         const loginForm = document.getElementById('loginForm');
-        const loginError = document.getElementById('loginError');
         const productForm = document.getElementById('productForm');
         const categoryForm = document.getElementById('categoryForm');
+        const postForm = document.getElementById('postForm');
+        const slideConfigForm = document.getElementById('slideConfigForm');
+        const pageSetupForm = document.getElementById('pageSetupForm');
+
+        // Form Elements
+        const loginError = document.getElementById('loginError');
         const newCategoryName = document.getElementById('newCategoryName');
         const existingCategories = document.getElementById('existingCategories');
         const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
@@ -510,22 +760,27 @@
         const addImageInputBtn = document.getElementById('addImageInputBtn');
         const shareBtn = document.getElementById('shareBtn');
         const slideshowContainer = document.getElementById('slideshowContainer');
-        const slideForm = document.getElementById('slideForm');
-        const slideList = document.getElementById('slideList');
-        const slideSubmitBtn = document.getElementById('slideSubmitBtn');
-        const slideDotsContainer = document.getElementById('slide-dots');
+        const postList = document.getElementById('postList');
+        const postSubmitBtn = document.getElementById('postSubmitBtn');
+        const saveSlideConfigBtn = document.getElementById('saveSlideConfigBtn');
+        const featuredSections = document.getElementById('featured-sections');
 
+        // State Variables
         let allProducts = [];
         let allCategories = [];
-        let allSlides = [];
+        let allPosts = [];
+        let slideshowConfig = {};
+        let siteConfig = {};
         let currentUser = null;
         let editingProductId = null;
-        let editingSlideId = null;
+        let editingPostId = null;
         let currentPage = 1;
-        const productsPerPage = 25;
+        const productsPerPage = 24;
         let currentDetailProductId = null;
-        let slideIndex = 0;
+        let currentSlide = 0;
         let slideInterval;
+        let isSliding = false;
+        let isInitialConfigLoaded = false;
 
         function showNotification(message, isError = false) {
             notification.textContent = message;
@@ -534,18 +789,23 @@
             setTimeout(() => { notification.classList.remove('show'); }, 3000);
         }
 
+        // --- AUTHENTICATION ---
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user && !user.isAnonymous) {
                 adminLoginBtn.classList.add('hidden');
                 adminPanelBtn.classList.remove('hidden');
+                postAndSlideManageBtn.classList.remove('hidden');
                 adminLogoutBtn.classList.remove('hidden');
                 resetAllViewsBtn.classList.remove('hidden');
+                pageSetupBtn.classList.remove('hidden');
             } else {
                 adminLoginBtn.classList.remove('hidden');
                 adminPanelBtn.classList.add('hidden');
+                postAndSlideManageBtn.classList.add('hidden');
                 adminLogoutBtn.classList.add('hidden');
                 resetAllViewsBtn.classList.add('hidden');
+                pageSetupBtn.classList.add('hidden');
             }
             applyFilters();
         });
@@ -560,10 +820,23 @@
             } catch (error) { console.error("Authentication failed:", error); }
         }
 
+        // --- FIREBASE REFERENCES ---
         const productsRef = ref(db, 'products');
         const categoriesRef = ref(db, 'categories');
         const metadataRef = ref(db, 'metadata');
-        const slideshowRef = ref(db, 'slideshow');
+        const postsRef = ref(db, 'posts');
+        const slideshowConfigRef = ref(db, 'slideshowConfig');
+        const siteConfigRef = ref(db, 'pageInfo');
+
+        // --- FIREBASE LISTENERS ---
+        onValue(siteConfigRef, (snapshot) => {
+            siteConfig = snapshot.val() || {};
+            updatePageContent(siteConfig);
+            if (!isInitialConfigLoaded) {
+                document.body.style.visibility = 'visible';
+                isInitialConfigLoaded = true;
+            }
+        });
 
         onValue(productsRef, (snapshot) => {
             const data = snapshot.val();
@@ -577,6 +850,7 @@
             document.getElementById('soldOutCount').textContent = soldOutCount;
             document.getElementById('totalImportCount').textContent = totalImportCount;
 
+            renderFeaturedSections();
             applyFilters();
             populateFilters();
             checkUrlForProduct();
@@ -589,15 +863,77 @@
             populateCategoryDropdown();
         });
 
-        onValue(slideshowRef, (snapshot) => {
+        onValue(postsRef, (snapshot) => {
             const data = snapshot.val();
-            allSlides = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            allPosts = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            allPosts.sort((a,b) => b.createdAt - a.createdAt); // Sort newest first
+            renderPostList();
+            populateSlideSelects();
             renderSlideshow();
-            renderSlideList();
         });
 
-        function renderProducts(productsToRender) {
-            productGrid.innerHTML = '';
+        onValue(slideshowConfigRef, (snapshot) => {
+            slideshowConfig = snapshot.val() || {};
+            renderSlideshow();
+            populateSlideSelects();
+        });
+        
+        // --- PAGE CONTENT UPDATE ---
+        function updatePageContent(config) {
+            
+            const setElementText = (elementId, value, placeholder, placeholderClass = 'placeholder') => {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    if (value) {
+                        el.textContent = value;
+                        el.classList.remove(...placeholderClass.split(' '));
+                    } else {
+                        el.textContent = placeholder;
+                        el.classList.add(...placeholderClass.split(' '));
+                    }
+                }
+            };
+
+            // Page & Header
+            document.title = config.siteName || 'J-Tech Cambodia';
+            setElementText('headerShopName', config.siteName, 'ឈ្មោះគេហទំព័រ');
+            setElementText('headerPhone', config.phone, 'លេខទូរស័ព្ទ');
+            document.getElementById('favicon').href = config.faviconUrl || 'https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png';
+            
+            // Logos with placeholders
+            const headerLogoEl = document.getElementById('headerLogo');
+            if (headerLogoEl) {
+                headerLogoEl.src = config.logoUrl || 'https://placehold.co/120x40/e2e8f0/64748b?text=Logo';
+            }
+            const bannerLogoEl = document.getElementById('bannerLogo');
+            if (bannerLogoEl) {
+                bannerLogoEl.src = config.logoUrl || 'https://placehold.co/128x128/e2e8f0/64748b?text=Logo';
+            }
+            
+            // Hero Banner
+            setElementText('bannerTagline', config.heroTitle, 'ចំណងជើង Hero Banner', 'placeholder-light');
+            setElementText('bannerDescription', config.heroDesc, 'សេចក្តីអធិប្បាយ Hero Banner', 'placeholder-light');
+
+            // Footer
+            setElementText('footerShopName', config.siteName, 'ឈ្មោះគេហទំព័រ');
+            setElementText('footerDescription', config.footerDesc, 'សេចក្តីអធិប្បាយ Footer');
+            setElementText('footerAddress', config.address, 'អាស័យដ្ឋាន');
+            setElementText('footerPhone', config.phone, 'លេខទូរស័ព្ទ');
+            document.getElementById('footerTelegram').href = config.telegramLink || '#';
+            document.getElementById('footerFacebook').href = config.facebookLink || '#';
+            setElementText('footerFacebookName', config.facebookName, 'ឈ្មោះ Facebook Page');
+            document.getElementById('footerGmaps').href = config.gmapsLink || '#';
+            
+            // Gmaps Image with placeholder
+            const gmapsImageEl = document.getElementById('footerGmapsImage');
+            if(gmapsImageEl) {
+                gmapsImageEl.src = config.gmapsImageUrl || 'https://placehold.co/300x200/e2e8f0/64748b?text=រូបភាពផែនទី';
+            }
+        }
+
+        // --- PRODUCT RENDERING & FILTERING ---
+        function renderProducts(productsToRender, container) {
+            container.innerHTML = '';
             
             productsToRender.forEach(product => {
                 const card = document.createElement('div');
@@ -618,7 +954,10 @@
                         <h3 class="text-lg font-bold text-gray-800 truncate">${product.name}</h3>
                         <p class="text-sm text-gray-500">${product.brand}</p>
                         <div class="flex justify-between items-center mt-2">
-                            <p class="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 self-start">${product.category || 'N/A'}</p>
+                            <div class="flex space-x-2 items-center">
+                                <p class="text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5">${product.category || 'N/A'}</p>
+                                <p class="text-xs font-semibold ${product.quality === 'ថ្មី' ? 'text-green-600 bg-green-100' : 'text-orange-600 bg-orange-100'} rounded-full px-2 py-0.5">${product.quality || 'មួយទឹក'}</p>
+                            </div>
                             <div class="flex items-center text-xs text-gray-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
                                 <span>${product.views || 0}</span>
@@ -637,12 +976,12 @@
                         ` : ''}
                     </div>
                 `;
-                productGrid.appendChild(card);
+                container.appendChild(card);
             });
 
-            document.querySelectorAll('.product-card').forEach(card => card.addEventListener('click', handleProductClick));
-            document.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEditProduct));
-            document.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteProduct));
+            container.querySelectorAll('.product-card').forEach(card => card.addEventListener('click', handleProductClick));
+            container.querySelectorAll('.edit-btn').forEach(btn => btn.addEventListener('click', handleEditProduct));
+            container.querySelectorAll('.delete-btn').forEach(btn => btn.addEventListener('click', handleDeleteProduct));
         }
 
         function filterProducts() {
@@ -757,12 +1096,24 @@
 
         function applyFilters() { 
             let filtered = filterProducts();
+            
+            // New sorting logic
             filtered.sort((a, b) => {
-                const statusA = a.status === 'soldOut' ? 1 : 0;
-                const statusB = b.status === 'soldOut' ? 1 : 0;
+                // Priority 1: Quality ('ថ្មី' comes first)
+                const qualityA = (a.quality === 'ថ្មី') ? 0 : 1;
+                const qualityB = (b.quality === 'ថ្មី') ? 0 : 1;
+                if (qualityA !== qualityB) {
+                    return qualityA - qualityB;
+                }
+
+                // Priority 2: Stock Status ('inStock' comes first)
+                const statusA = (a.status === 'soldOut') ? 1 : 0;
+                const statusB = (b.status === 'soldOut') ? 1 : 0;
                 if (statusA !== statusB) {
                     return statusA - statusB;
                 }
+
+                // Priority 3: Views (higher views first) - Keep as a tie-breaker
                 return (b.views || 0) - (a.views || 0);
             });
             
@@ -770,7 +1121,7 @@
             const endIndex = startIndex + productsPerPage;
             const paginatedProducts = filtered.slice(startIndex, endIndex);
 
-            renderProducts(paginatedProducts);
+            renderProducts(paginatedProducts, productGrid);
             renderPagination(filtered.length);
         }
         
@@ -779,12 +1130,26 @@
             el.addEventListener('change', () => { currentPage = 1; applyFilters(); });
         });
 
+        // --- MODAL HANDLING ---
         adminLoginBtn.addEventListener('click', () => { loginModal.style.display = 'flex'; });
         closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
         adminPanelBtn.addEventListener('click', () => { prepareNewProductForm(); adminModal.style.display = 'flex'; });
         closeAdminModal.addEventListener('click', () => { adminModal.style.display = 'none'; });
+        postAndSlideManageBtn.addEventListener('click', () => { postAndSlideModal.style.display = 'flex'; });
+        closePostAndSlideModal.addEventListener('click', () => { postAndSlideModal.style.display = 'none'; });
         closeDetailModal.addEventListener('click', () => { productDetailModal.style.display = 'none'; });
+        closePostDetailModal.addEventListener('click', () => { postDetailModal.style.display = 'none'; });
         closeZoomModal.addEventListener('click', () => { imageZoomModal.style.display = 'none'; });
+        
+        pageSetupBtn.addEventListener('click', () => {
+            loadConfigToForm();
+            pageSetupModal.style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('siteName').focus();
+            }, 50);
+        });
+        
+        closePageSetupModal.addEventListener('click', () => { pageSetupModal.style.display = 'none'; });
         
         window.addEventListener('click', (e) => {
             if (e.target === loginModal) loginModal.style.display = 'none';
@@ -831,6 +1196,11 @@
                 detailStatusEl.className = 'text-green-500 font-bold';
             }
 
+            const detailQualityEl = document.getElementById('detailQuality');
+            detailQualityEl.textContent = product.quality || 'មួយទឹក';
+            detailQualityEl.className = product.quality === 'ថ្មី' ? 'text-green-600 font-bold' : 'text-orange-600 font-bold';
+
+
             const mainImageEl = document.getElementById('mainImage');
             const thumbnailContainer = document.getElementById('thumbnailContainer');
             thumbnailContainer.innerHTML = '';
@@ -861,7 +1231,20 @@
             }
             productDetailModal.style.display = 'flex';
         }
+        
+        function showPostDetails(postId) {
+            const post = allPosts.find(p => p.id === postId);
+            if (!post) return;
 
+            document.getElementById('postDetailImage').src = post.imageUrl;
+            document.getElementById('postDetailTitle').textContent = post.title;
+            document.getElementById('postDetailDate').textContent = `កាលបរិច្ឆេទ: ${new Date(post.createdAt).toLocaleDateString('km-KH')}`;
+            document.getElementById('postDetailContent').textContent = post.content;
+            
+            postDetailModal.style.display = 'flex';
+        }
+
+        // --- FORM SUBMISSIONS ---
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loginError.textContent = '';
@@ -880,6 +1263,51 @@
             try { await signOut(auth); await initializeAuth(); } 
             catch (error) { console.error("Logout failed:", error); }
         });
+
+        pageSetupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newConfig = {
+                siteName: document.getElementById('siteName').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                faviconUrl: document.getElementById('faviconUrl').value.trim(),
+                logoUrl: document.getElementById('logoUrl').value.trim(),
+                heroTitle: document.getElementById('heroTitle').value.trim(),
+                heroDesc: document.getElementById('heroDesc').value.trim(),
+                footerDesc: document.getElementById('footerDesc').value.trim(),
+                address: document.getElementById('address').value.trim(),
+                facebookName: document.getElementById('facebookName').value.trim(),
+                facebookLink: document.getElementById('facebookLink').value.trim(),
+                telegramLink: document.getElementById('telegramLink').value.trim(),
+                gmapsLink: document.getElementById('gmapsLink').value.trim(),
+                gmapsImageUrl: document.getElementById('gmapsImageUrl').value.trim(),
+            };
+            try {
+                await set(siteConfigRef, newConfig);
+                showNotification('រក្សាទុកការផ្លាស់ប្តូរបានជោគជ័យ!');
+                pageSetupModal.style.display = 'none';
+            } catch (error) {
+                showNotification('មានបញ្ហាក្នុងការរក្សាទុកការកំណត់។', true);
+                console.error("Error saving site config:", error);
+            }
+        });
+
+        async function loadConfigToForm() {
+            const snapshot = await get(siteConfigRef);
+            const currentConfig = snapshot.val() || {};
+            document.getElementById('siteName').value = currentConfig.siteName || '';
+            document.getElementById('phone').value = currentConfig.phone || '';
+            document.getElementById('faviconUrl').value = currentConfig.faviconUrl || '';
+            document.getElementById('logoUrl').value = currentConfig.logoUrl || '';
+            document.getElementById('heroTitle').value = currentConfig.heroTitle || '';
+            document.getElementById('heroDesc').value = currentConfig.heroDesc || '';
+            document.getElementById('footerDesc').value = currentConfig.footerDesc || '';
+            document.getElementById('address').value = currentConfig.address || '';
+            document.getElementById('facebookName').value = currentConfig.facebookName || '';
+            document.getElementById('facebookLink').value = currentConfig.facebookLink || '';
+            document.getElementById('telegramLink').value = currentConfig.telegramLink || '';
+            document.getElementById('gmapsLink').value = currentConfig.gmapsLink || '';
+            document.getElementById('gmapsImageUrl').value = currentConfig.gmapsImageUrl || '';
+        }
 
         addImageInputBtn.addEventListener('click', () => {
             if (imageInputsContainer.children.length < 10) {
@@ -911,6 +1339,7 @@
                 brand: document.getElementById('productBrand').value,
                 category: document.getElementById('productCategory').value,
                 price: parseFloat(document.getElementById('productPrice').value),
+                quality: document.getElementById('productQuality').value,
                 importQty: parseInt(document.getElementById('productImportQty').value) || 0,
                 description: document.getElementById('productDescription').value,
                 status: document.getElementById('productStatus').value,
@@ -980,6 +1409,7 @@
                 document.getElementById('productBrand').value = product.brand;
                 document.getElementById('productCategory').value = product.category;
                 document.getElementById('productPrice').value = product.price;
+                document.getElementById('productQuality').value = product.quality || 'មួយទឹក';
                 document.getElementById('productImportQty').value = product.importQty || 1;
                 document.getElementById('productDescription').value = product.description;
                 document.getElementById('productStatus').value = product.status || 'inStock';
@@ -1025,6 +1455,7 @@
         
         function resetProductForm() {
             productForm.reset();
+            document.getElementById('productQuality').value = 'មួយទឹក';
             imageInputsContainer.innerHTML = '';
             addImageInput();
             editingProductId = null;
@@ -1104,118 +1535,272 @@
             }
         }
 
+        // --- SLIDESHOW / POSTS ---
         function renderSlideshow() {
             slideshowContainer.innerHTML = '';
-            if (allSlides.length === 0) return;
+            
+            const slidesToShow = [];
+            for (const key in slideshowConfig) {
+                const postId = slideshowConfig[key];
+                const post = allPosts.find(p => p.id === postId);
+                if (post) {
+                    slidesToShow.push(post);
+                }
+            }
 
-            allSlides.forEach(slide => {
+            if (slidesToShow.length === 0) return;
+
+            slidesToShow.forEach((post) => {
                 const slideDiv = document.createElement('div');
-                slideDiv.className = 'slide absolute inset-0 bg-white flex items-center p-4';
+                slideDiv.className = 'slide';
+                slideDiv.dataset.postId = post.id;
                 slideDiv.innerHTML = `
-                    <div class="w-1/2 pr-4 slide-text-container">
-                        <p class="text-2xl font-bold text-gray-800">${slide.text}</p>
-                    </div>
-                    <div class="w-1/2 h-full slide-image-container">
-                        <img src="${slide.imageUrl}" class="w-full h-full object-contain rounded-lg slide-image">
+                    <div class="slide-content-wrapper">
+                        <div class="slide-text-container">
+                             <h3 class="text-3xl font-koulen mb-4">${post.title}</h3>
+                             <p class="text-gray-700 text-lg">${post.content.substring(0, 150)}...</p>
+                        </div>
+                        <div class="slide-image-container">
+                            <img src="${post.imageUrl}" alt="${post.title}">
+                        </div>
                     </div>
                 `;
+                slideDiv.addEventListener('click', () => showPostDetails(post.id));
                 slideshowContainer.appendChild(slideDiv);
             });
-            slideIndex = 0;
-            showSlides();
-        }
-
-        function showSlides() {
-            if (allSlides.length === 0) return;
-            let slides = slideshowContainer.getElementsByClassName("slide");
-            for (let i = 0; i < slides.length; i++) {
-                slides[i].style.display = "none";
-                slides[i].classList.remove('active');
-            }
-            slideIndex++;
-            if (slideIndex > slides.length) {slideIndex = 1}
-            slides[slideIndex-1].style.display = "flex";
-            setTimeout(() => {
-                slides[slideIndex-1].classList.add('active');
-            }, 50);
             
-            clearInterval(slideInterval);
-            slideInterval = setTimeout(showSlides, 5000); 
+            const prevButton = document.createElement('button');
+            prevButton.id = 'prevSlide';
+            prevButton.className = 'slide-nav';
+            prevButton.innerHTML = '&#10094;';
+            prevButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                moveSlide(-1);
+                resetSlideInterval();
+            });
+
+            const nextButton = document.createElement('button');
+            nextButton.id = 'nextSlide';
+            nextButton.className = 'slide-nav';
+            nextButton.innerHTML = '&#10095;';
+            nextButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                moveSlide(1);
+                resetSlideInterval();
+            });
+
+            slideshowContainer.appendChild(prevButton);
+            slideshowContainer.appendChild(nextButton);
+
+            slideshowContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            slideshowContainer.addEventListener('mouseleave', resetSlideInterval);
+
+            currentSlide = 0;
+            showSlide(currentSlide, true); // Initial show without animation
+            
+            resetSlideInterval();
+        }
+        
+        function resetSlideInterval() {
+             clearInterval(slideInterval);
+             slideInterval = setInterval(() => moveSlide(1), 5000);
         }
 
-        function renderSlideList() {
-            slideList.innerHTML = '';
-            allSlides.forEach(slide => {
+        function showSlide(index, isInitial = false) {
+            const slides = slideshowContainer.querySelectorAll('.slide');
+            if(slides.length === 0) return;
+
+            slides.forEach(slide => {
+                slide.classList.remove('active', 'slide-in-right', 'slide-in-left');
+            });
+
+            if (isInitial) {
+                slides[index].classList.add('active');
+            } else {
+                slides[index].classList.add('active');
+            }
+        }
+
+        function moveSlide(n) {
+            if (isSliding) return;
+            isSliding = true;
+
+            const slides = slideshowContainer.querySelectorAll('.slide');
+            if (slides.length === 0) {
+                isSliding = false;
+                return;
+            }
+
+            const oldSlideIndex = currentSlide;
+            let newSlideIndex = oldSlideIndex + n;
+
+            if (newSlideIndex >= slides.length) { newSlideIndex = 0; }
+            if (newSlideIndex < 0) { newSlideIndex = slides.length - 1; }
+            
+            const oldSlide = slides[oldSlideIndex];
+            const newSlide = slides[newSlideIndex];
+            
+            newSlide.classList.remove('slide-in-right', 'slide-in-left');
+
+            if (n > 0) {
+                newSlide.classList.add('slide-in-right');
+            } else {
+                newSlide.classList.add('slide-in-left');
+            }
+            
+            oldSlide.classList.remove('active');
+            newSlide.classList.add('active');
+            
+            currentSlide = newSlideIndex;
+
+            setTimeout(() => {
+                isSliding = false;
+            }, 600); // Match animation duration
+        }
+
+        function renderPostList() {
+            postList.innerHTML = '';
+            allPosts.forEach(post => {
                 const el = document.createElement('div');
                 el.className = 'flex items-center justify-between bg-white p-2 rounded';
                 el.innerHTML = `
-                    <img src="${slide.imageUrl}" class="w-16 h-10 object-cover rounded">
-                    <p class="text-sm truncate mx-2 flex-grow">${slide.text}</p>
+                    <img src="${post.imageUrl}" class="w-16 h-10 object-cover rounded">
+                    <p class="text-sm truncate mx-2 flex-grow">${post.title}</p>
                     <div class="flex space-x-2">
-                        <button data-id="${slide.id}" class="edit-slide-btn bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">✏️</button>
-                        <button data-id="${slide.id}" class="delete-slide-btn bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">X</button>
+                        <button data-id="${post.id}" class="edit-post-btn bg-yellow-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">✏️</button>
+                        <button data-id="${post.id}" class="delete-post-btn bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">X</button>
                     </div>
                 `;
-                el.querySelector('.edit-slide-btn').addEventListener('click', handleEditSlide);
-                el.querySelector('.delete-slide-btn').addEventListener('click', handleDeleteSlide);
-                slideList.appendChild(el);
+                el.querySelector('.edit-post-btn').addEventListener('click', handleEditPost);
+                el.querySelector('.delete-post-btn').addEventListener('click', handleDeletePost);
+                postList.appendChild(el);
             });
         }
-
-        slideForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const imageUrl = document.getElementById('slideImageUrl').value;
-            const text = document.getElementById('slideText').value;
-            if (imageUrl && text) {
-                const slideData = { imageUrl, text };
-                try {
-                    if (editingSlideId) {
-                        await update(ref(db, `slideshow/${editingSlideId}`), slideData);
-                        showNotification('Update ស្លាយបានជោគជ័យ!');
-                    } else {
-                        await set(push(slideshowRef), slideData);
-                        showNotification('បានបន្ថែមស្លាយថ្មី!');
-                    }
-                    resetSlideForm();
-                } catch (error) {
-                    showNotification('មានបញ្ហាក្នុងការរក្សាទុកស្លាយ។', true);
+        
+        function populateSlideSelects() {
+            slideConfigForm.innerHTML = '';
+            const postOptions = allPosts.map(p => `<option value="${p.id}">${p.title}</option>`).join('');
+            
+            for(let i = 1; i <= 5; i++) { // Create 5 slide selectors
+                const selectDiv = document.createElement('div');
+                selectDiv.innerHTML = `
+                    <label for="slide${i}-select" class="block text-gray-700 font-semibold">Slide ${i}</label>
+                    <select id="slide${i}-select" class="w-full p-2 border rounded-lg">
+                        <option value="">-- មិនជ្រើសរើស --</option>
+                        ${postOptions}
+                    </select>
+                `;
+                slideConfigForm.appendChild(selectDiv);
+                
+                // Set the selected value based on current config
+                const selectEl = document.getElementById(`slide${i}-select`);
+                if(slideshowConfig[`slide${i}`]) {
+                    selectEl.value = slideshowConfig[`slide${i}`];
                 }
+            }
+        }
+        
+        saveSlideConfigBtn.addEventListener('click', async () => {
+            const newConfig = {};
+            for(let i = 1; i <= 5; i++) {
+                const selectEl = document.getElementById(`slide${i}-select`);
+                if (selectEl.value) {
+                    newConfig[`slide${i}`] = selectEl.value;
+                }
+            }
+            try {
+                await set(slideshowConfigRef, newConfig);
+                showNotification('រក្សាទុកការកំណត់ស្លាយបានជោគជ័យ!');
+            } catch (error) {
+                showNotification('មានបញ្ហាក្នុងការរក្សាទុកការកំណត់ស្លាយ។', true);
+            }
+        });
+
+        postForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const postData = {
+                title: document.getElementById('postTitle').value,
+                imageUrl: document.getElementById('postImageUrl').value,
+                content: document.getElementById('postContent').value,
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                if (editingPostId) {
+                    delete postData.createdAt; 
+                    await update(ref(db, `posts/${editingPostId}`), postData);
+                    showNotification('Update Post បានជោគជ័យ!');
+                } else {
+                    await set(push(postsRef), postData);
+                    showNotification('បានបន្ថែម Post ថ្មី!');
+                }
+                resetPostForm();
+            } catch (error) {
+                showNotification('មានបញ្ហាក្នុងការរក្សាទុក Post។', true);
             }
         });
         
-        function resetSlideForm() {
-            slideForm.reset();
-            editingSlideId = null;
-            slideSubmitBtn.textContent = 'បន្ថែមស្លាយ';
-            slideSubmitBtn.classList.replace('bg-orange-500', 'bg-blue-500');
-            slideSubmitBtn.classList.replace('hover:bg-orange-600', 'hover:bg-blue-600');
+        function resetPostForm() {
+            postForm.reset();
+            editingPostId = null;
+            postSubmitBtn.textContent = 'បន្ថែម Post';
+            postSubmitBtn.classList.replace('bg-orange-500', 'bg-blue-500');
+            postSubmitBtn.classList.replace('hover:bg-orange-600', 'hover:bg-blue-600');
         }
 
-        function handleEditSlide(e) {
+        function handleEditPost(e) {
             const id = e.target.dataset.id;
-            const slide = allSlides.find(s => s.id === id);
-            if (slide) {
-                editingSlideId = id;
-                document.getElementById('slideImageUrl').value = slide.imageUrl;
-                document.getElementById('slideText').value = slide.text;
-                slideSubmitBtn.textContent = 'Update ស្លាយ';
-                slideSubmitBtn.classList.replace('bg-blue-500', 'bg-orange-500');
-                slideSubmitBtn.classList.replace('hover:bg-blue-600', 'hover:bg-orange-600');
+            const post = allPosts.find(p => p.id === id);
+            if (post) {
+                editingPostId = id;
+                document.getElementById('postTitle').value = post.title;
+                document.getElementById('postImageUrl').value = post.imageUrl;
+                document.getElementById('postContent').value = post.content;
+                postSubmitBtn.textContent = 'Update Post';
+                postSubmitBtn.classList.replace('bg-blue-500', 'bg-orange-500');
+                postSubmitBtn.classList.replace('hover:bg-blue-600', 'hover:bg-orange-600');
             }
         }
 
-        async function handleDeleteSlide(e) {
+        async function handleDeletePost(e) {
             const id = e.target.dataset.id;
-            if (confirm('តើអ្នកពិតជាចង់លុបស្លាយនេះមែនទេ?')) {
+            if (confirm('តើអ្នកពិតជាចង់លុប Post នេះមែនទេ?')) {
                 try {
-                    await remove(ref(db, `slideshow/${id}`));
-                    showNotification('ស្លាយត្រូវបានលុប។', true);
+                    await remove(ref(db, `posts/${id}`));
+                    showNotification('Post ត្រូវបានលុប។', true);
                 } catch (error) {
-                    showNotification('មានបញ្ហាក្នុងការលុបស្លាយ។', true);
+                    showNotification('មានបញ្ហាក្នុងការលុប Post។', true);
                 }
             }
         }
+        
+        // --- FEATURED SECTIONS ---
+        function renderFeaturedSections() {
+            const sortedByCode = [...allProducts].sort((a, b) => {
+                const codeA = parseInt((a.productCode || 'JTC-0').split('-')[1]);
+                const codeB = parseInt((b.productCode || 'JTC-0').split('-')[1]);
+                return codeB - codeA;
+            });
+            const sortedByViews = [...allProducts].sort((a,b) => (b.views || 0) - (a.views || 0));
 
+            const newArrivals = sortedByCode.slice(0, 20);
+            const popularItems = sortedByViews.slice(0, 6);
+
+            featuredSections.innerHTML = `
+                <div id="new-arrivals-section">
+                    <h2 class="text-2xl font-koulen mb-4">ទំនិញទើបមកដល់</h2>
+                    <div id="newArrivalsGrid" class="scroll-container"></div>
+                </div>
+                <div id="popular-items-section">
+                    <h2 class="text-2xl font-koulen mb-4">ទំនិញពេញនិយម</h2>
+                    <div id="popularItemsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+                </div>
+            `;
+            renderProducts(newArrivals, document.getElementById('newArrivalsGrid'));
+            renderProducts(popularItems, document.getElementById('popularItemsGrid'));
+        }
+
+        // --- INITIALIZATION ---
         async function main() {
             await initializeAuth();
         }
