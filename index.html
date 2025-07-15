@@ -12,6 +12,10 @@
             font-family: 'Noto Sans Khmer', sans-serif;
             background-color: #f0f2f5;
         }
+        /* New style to prevent background scroll when modal is open */
+        body.modal-open {
+            overflow: hidden;
+        }
         h1, h2, h3, .font-koulen {
             font-family: 'Koulen', cursive;
         }
@@ -36,9 +40,12 @@
             width: 90%;
             max-width: 500px;
             animation: fadeIn 0.3s;
+            position: relative; /* Added for positioning close button */
         }
         #productDetailModal .modal-content, #adminModal .modal-content, #pageSetupModal .modal-content, #postDetailModal .modal-content, #postAndSlideModal .modal-content {
             max-width: 1000px;
+            max-height: 90vh; /* Add max-height for scrolling */
+            overflow-y: auto; /* Enable vertical scroll inside modal */
         }
         #imageZoomModal {
             background-color: rgba(0,0,0,0.85);
@@ -232,6 +239,18 @@
                 width: calc(100% / 6.5); /* lg */
             }
         }
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+            color: #6b7280;
+            cursor: pointer;
+        }
+        .modal-close-btn:hover {
+            color: #1f2937;
+        }
     </style>
 </head>
 <body class="bg-gray-100" style="visibility: hidden;">
@@ -382,6 +401,7 @@
     <!-- Admin Login Modal -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
+            <button id="closeLoginModal" class="modal-close-btn">&times;</button>
             <h2 class="text-2xl font-koulen mb-4 text-center">ចូលក្នុងគណនី Admin</h2>
             <form id="loginForm">
                 <div class="mb-4">
@@ -394,7 +414,7 @@
                 </div>
                 <p id="loginError" class="text-red-500 text-sm mb-4"></p>
                 <div class="flex justify-end space-x-3">
-                    <button type="button" id="closeLoginModal" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg">បោះបង់</button>
+                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg" onclick="document.getElementById('loginModal').style.display='none'; document.body.classList.remove('modal-open');">បោះបង់</button>
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">ចូល</button>
                 </div>
             </form>
@@ -404,6 +424,7 @@
     <!-- Admin Panel Modal -->
     <div id="adminModal" class="modal">
         <div class="modal-content max-w-4xl">
+            <button id="closeAdminModal" class="modal-close-btn">&times;</button>
             <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រងផលិតផល</h2>
             
             <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
@@ -479,16 +500,13 @@
                     <button type="button" id="deleteCategoryBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">លុប</button>
                 </div>
             </div>
-
-            <div class="flex justify-end mt-6">
-                <button type="button" id="closeAdminModal" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">បិទផ្ទាំងបញ្ជា</button>
-            </div>
         </div>
     </div>
     
     <!-- Post and Slide Management Modal -->
     <div id="postAndSlideModal" class="modal">
         <div class="modal-content">
+            <button id="closePostAndSlideModal" class="modal-close-btn">&times;</button>
              <h2 class="text-2xl font-koulen mb-6 text-center">គ្រប់គ្រង Post និង Slideshow</h2>
              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- Post Management Section -->
@@ -522,15 +540,13 @@
                      <button id="saveSlideConfigBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">រក្សាទុកការកំណត់ស្លាយ</button>
                 </div>
              </div>
-             <div class="flex justify-end mt-6">
-                <button type="button" id="closePostAndSlideModal" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">បិទ</button>
-            </div>
         </div>
     </div>
 
     <!-- Product Detail Modal -->
     <div id="productDetailModal" class="modal">
         <div class="modal-content">
+            <button id="closeDetailModal" class="modal-close-btn">&times;</button>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <img id="mainImage" src="" alt="Product Image" class="w-full h-80 object-contain bg-white rounded-lg mb-4">
@@ -563,16 +579,15 @@
                     </button>
                 </div>
             </div>
-            <button id="closeDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
         </div>
     </div>
     
     <!-- Post Detail Modal -->
     <div id="postDetailModal" class="modal">
-        <div class="modal-content relative">
-             <button id="closePostDetailModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-3xl z-10">&times;</button>
+        <div class="modal-content">
+             <button id="closePostDetailModal" class="modal-close-btn">&times;</button>
              <div class="max-h-[80vh] overflow-y-auto">
-                <img id="postDetailImage" src="" alt="Post Image" class="w-full h-64 object-cover rounded-t-lg mb-4">
+                <img id="postDetailImage" src="" alt="Post Image" class="w-full max-h-96 object-contain rounded-lg mb-4 bg-gray-100">
                 <div class="p-4">
                     <h2 id="postDetailTitle" class="text-3xl font-koulen mb-2"></h2>
                     <p id="postDetailDate" class="text-gray-500 text-sm mb-4"></p>
@@ -591,6 +606,7 @@
     <!-- Page Setup Modal -->
     <div id="pageSetupModal" class="modal">
         <div class="modal-content">
+            <button id="closePageSetupModal" class="modal-close-btn">&times;</button>
             <h2 class="text-2xl font-koulen mb-6 text-center">កំណត់ค่าគេហទំព័រ</h2>
             <form id="pageSetupForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -655,7 +671,7 @@
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" id="closePageSetupModal" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg">បោះបង់</button>
+                    <button type="button" class="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-lg" onclick="document.getElementById('pageSetupModal').style.display='none'; document.body.classList.remove('modal-open');">បោះបង់</button>
                     <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">រក្សាទុកការផ្លាស់ប្តូរ</button>
                 </div>
             </form>
@@ -730,15 +746,6 @@
         const postDetailModal = document.getElementById('postDetailModal');
         const imageZoomModal = document.getElementById('imageZoomModal');
         const pageSetupModal = document.getElementById('pageSetupModal');
-
-        // Modal Close Buttons
-        const closeLoginModal = document.getElementById('closeLoginModal');
-        const closeAdminModal = document.getElementById('closeAdminModal');
-        const closePostAndSlideModal = document.getElementById('closePostAndSlideModal');
-        const closeDetailModal = document.getElementById('closeDetailModal');
-        const closePostDetailModal = document.getElementById('closePostDetailModal');
-        const closeZoomModal = document.getElementById('closeZoomModal');
-        const closePageSetupModal = document.getElementById('closePageSetupModal');
 
         // Forms
         const loginForm = document.getElementById('loginForm');
@@ -1131,30 +1138,46 @@
         });
 
         // --- MODAL HANDLING ---
-        adminLoginBtn.addEventListener('click', () => { loginModal.style.display = 'flex'; });
-        closeLoginModal.addEventListener('click', () => { loginModal.style.display = 'none'; });
-        adminPanelBtn.addEventListener('click', () => { prepareNewProductForm(); adminModal.style.display = 'flex'; });
-        closeAdminModal.addEventListener('click', () => { adminModal.style.display = 'none'; });
-        postAndSlideManageBtn.addEventListener('click', () => { postAndSlideModal.style.display = 'flex'; });
-        closePostAndSlideModal.addEventListener('click', () => { postAndSlideModal.style.display = 'none'; });
-        closeDetailModal.addEventListener('click', () => { productDetailModal.style.display = 'none'; });
-        closePostDetailModal.addEventListener('click', () => { postDetailModal.style.display = 'none'; });
-        closeZoomModal.addEventListener('click', () => { imageZoomModal.style.display = 'none'; });
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            document.body.classList.add('modal-open');
+        }
+
+        function closeModal(modal) {
+            modal.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+
+        adminLoginBtn.addEventListener('click', () => openModal(loginModal));
+        document.getElementById('closeLoginModal').addEventListener('click', () => closeModal(loginModal));
+        
+        adminPanelBtn.addEventListener('click', () => {
+            prepareNewProductForm();
+            openModal(adminModal);
+        });
+        document.getElementById('closeAdminModal').addEventListener('click', () => closeModal(adminModal));
+        
+        postAndSlideManageBtn.addEventListener('click', () => openModal(postAndSlideModal));
+        document.getElementById('closePostAndSlideModal').addEventListener('click', () => closeModal(postAndSlideModal));
+        
+        document.getElementById('closeDetailModal').addEventListener('click', () => closeModal(productDetailModal));
+        document.getElementById('closePostDetailModal').addEventListener('click', () => closeModal(postDetailModal));
+        document.getElementById('closeZoomModal').addEventListener('click', () => closeModal(imageZoomModal));
         
         pageSetupBtn.addEventListener('click', () => {
             loadConfigToForm();
-            pageSetupModal.style.display = 'flex';
+            openModal(pageSetupModal);
             setTimeout(() => {
                 document.getElementById('siteName').focus();
             }, 50);
         });
         
-        closePageSetupModal.addEventListener('click', () => { pageSetupModal.style.display = 'none'; });
+        document.getElementById('closePageSetupModal').addEventListener('click', () => closeModal(pageSetupModal));
         
         window.addEventListener('click', (e) => {
-            if (e.target === loginModal) loginModal.style.display = 'none';
-            if (e.target === productDetailModal) productDetailModal.style.display = 'none';
-            if (e.target === imageZoomModal) imageZoomModal.style.display = 'none';
+            if (e.target === loginModal) closeModal(loginModal);
+            if (e.target === productDetailModal) closeModal(productDetailModal);
+            if (e.target === imageZoomModal) closeModal(imageZoomModal);
         });
 
         function handleProductClick(e) {
@@ -1170,8 +1193,8 @@
         }
 
         function openZoomModal(imageUrl) {
+            openModal(imageZoomModal);
             document.getElementById('zoomedImage').src = imageUrl;
-            imageZoomModal.style.display = 'flex';
         }
 
         function showProductDetails(productId) {
@@ -1229,7 +1252,7 @@
                  mainImageEl.classList.remove('cursor-pointer');
                  mainImageEl.onclick = null;
             }
-            productDetailModal.style.display = 'flex';
+            openModal(productDetailModal);
         }
         
         function showPostDetails(postId) {
@@ -1241,7 +1264,7 @@
             document.getElementById('postDetailDate').textContent = `កាលបរិច្ឆេទ: ${new Date(post.createdAt).toLocaleDateString('km-KH')}`;
             document.getElementById('postDetailContent').textContent = post.content;
             
-            postDetailModal.style.display = 'flex';
+            openModal(postDetailModal);
         }
 
         // --- FORM SUBMISSIONS ---
@@ -1252,7 +1275,7 @@
             const password = document.getElementById('loginPassword').value;
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                loginModal.style.display = 'none';
+                closeModal(loginModal);
                 loginForm.reset();
             } catch (error) {
                 loginError.textContent = 'អ៊ីមែល ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។';
@@ -1284,7 +1307,7 @@
             try {
                 await set(siteConfigRef, newConfig);
                 showNotification('រក្សាទុកការផ្លាស់ប្តូរបានជោគជ័យ!');
-                pageSetupModal.style.display = 'none';
+                closeModal(pageSetupModal);
             } catch (error) {
                 showNotification('មានបញ្ហាក្នុងការរក្សាទុកការកំណត់។', true);
                 console.error("Error saving site config:", error);
@@ -1366,7 +1389,7 @@
                     }
                 }
                 resetProductForm();
-                adminModal.style.display = 'none';
+                closeModal(adminModal);
             } catch (error) {
                 console.error("Error saving product:", error);
                 showNotification('មានបញ្ហាក្នុងការរក្សាទុកផលិតផល។', true);
@@ -1424,7 +1447,7 @@
                 formTitle.textContent = 'កែប្រែផលិតផល';
                 cancelEditBtn.classList.remove('hidden');
                 resetViewBtn.classList.remove('hidden');
-                adminModal.style.display = 'flex';
+                openModal(adminModal);
                 setTimeout(() => document.getElementById('productName').focus(), 50);
             }
         }
@@ -1465,7 +1488,7 @@
             document.getElementById('productCode').value = 'កំពុងបង្កើត...';
         }
 
-        cancelEditBtn.addEventListener('click', () => adminModal.style.display = 'none');
+        cancelEditBtn.addEventListener('click', () => closeModal(adminModal));
 
         resetViewBtn.addEventListener('click', async () => {
             if (!editingProductId) return;
@@ -1609,22 +1632,31 @@
         function showSlide(index, isInitial = false) {
             const slides = slideshowContainer.querySelectorAll('.slide');
             if(slides.length === 0) return;
-
-            slides.forEach(slide => {
+            
+            if (index >= slides.length) { currentSlide = 0; }
+            if (index < 0) { currentSlide = slides.length - 1; }
+            
+            slides.forEach((slide) => {
                 slide.classList.remove('active', 'slide-in-right', 'slide-in-left');
             });
-
-            if (isInitial) {
-                slides[index].classList.add('active');
-            } else {
-                slides[index].classList.add('active');
+            
+            const newSlide = slides[currentSlide];
+            
+            if (!isInitial) {
+                 if(index > currentSlide) {
+                    newSlide.classList.add('slide-in-right');
+                } else {
+                    newSlide.classList.add('slide-in-left');
+                }
             }
+
+            newSlide.classList.add('active');
         }
 
         function moveSlide(n) {
             if (isSliding) return;
             isSliding = true;
-
+            
             const slides = slideshowContainer.querySelectorAll('.slide');
             if (slides.length === 0) {
                 isSliding = false;
@@ -1640,15 +1672,16 @@
             const oldSlide = slides[oldSlideIndex];
             const newSlide = slides[newSlideIndex];
             
-            newSlide.classList.remove('slide-in-right', 'slide-in-left');
+            oldSlide.classList.remove('active');
+            
+            newSlide.classList.remove('slide-in-right', 'slide-in-left'); // Reset animation class
+            void newSlide.offsetWidth; // Trigger reflow
 
-            if (n > 0) {
+            if (n > 0 || (oldSlideIndex === slides.length - 1 && newSlideIndex === 0)) {
                 newSlide.classList.add('slide-in-right');
             } else {
                 newSlide.classList.add('slide-in-left');
             }
-            
-            oldSlide.classList.remove('active');
             newSlide.classList.add('active');
             
             currentSlide = newSlideIndex;
