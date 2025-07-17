@@ -7,6 +7,8 @@
     <link id="favicon" rel="icon" type="image/png" href="https://i.ibb.co/G32NBxCk/J-TECH-Cambodia-Logo-Concept1.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Noto+Sans+Khmer:wght@400;700&display=swap" rel="stylesheet">
+    <!-- html2pdf.js for robust PDF Export with Unicode support -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" xintegrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         body {
             font-family: 'Noto Sans Khmer', sans-serif;
@@ -42,8 +44,8 @@
             animation: fadeIn 0.3s;
             position: relative; /* Added for positioning close button */
         }
-        #productDetailModal .modal-content, #adminModal .modal-content, #pageSetupModal .modal-content, #postDetailModal .modal-content, #postAndSlideModal .modal-content {
-            max-width: 1000px;
+        #productDetailModal .modal-content, #adminModal .modal-content, #pageSetupModal .modal-content, #postDetailModal .modal-content, #postAndSlideModal .modal-content, #stockManagementModal .modal-content {
+            max-width: 95vw; /* Make it almost full-width */
             max-height: 90vh; /* Add max-height for scrolling */
             overflow-y: auto; /* Enable vertical scroll inside modal */
         }
@@ -324,7 +326,8 @@
                 <div class="flex items-center space-x-4">
                     <div id="auth-header-section" class="hidden md:flex items-center space-x-2">
                         <button id="adminLoginBtn" class="text-blue-600 hover:text-blue-800 text-sm font-semibold">Admin Login</button>
-                        <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">គ្រប់គ្រងផលិតផល</button>
+                        <button id="adminPanelBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">បន្ថែមផលិតផល</button>
+                        <button id="stockManageBtn" class="hidden bg-teal-500 hover:bg-teal-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">គ្រប់គ្រងស្តុក</button>
                         <button id="postAndSlideManageBtn" class="hidden bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">គ្រប់គ្រង Post & ស្លាយ</button>
                         <button id="pageSetupBtn" class="hidden bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">Page Setup</button>
                         <button id="resetAllViewsBtn" class="hidden bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-3 rounded-lg transition duration-300 text-sm">Reset Views</button>
@@ -355,16 +358,16 @@
     <!-- Main Content -->
     <main class="container mx-auto p-4 sm:p-6 lg:p-8">
         
-        <section class="hero-banner text-white rounded-lg shadow-lg p-6 md:p-8 mb-8 flex items-center">
+        <section class="hero-banner text-white rounded-lg shadow-lg p-6 md:p-8 flex items-center">
             <div class="w-full md:w-2/3">
                 <h2 id="bannerTagline" class="text-2xl md:text-4xl font-koulen mb-3">J-TECH CAMBODIA ផលិតផលគុណភាពពីជប៉ុន</h2>
                 <p id="bannerDescription" class="mb-5 text-sm md:text-base">យើងខ្ញុំមានលក់កុំព្យូទ័រ និងគ្រឿងអេឡិចត្រូនិចមួយទឹក ដែលមានគុណភាពខ្ពស់ នាំចូលដោយផ្ទាល់ពីប្រទេសជប៉ុន។</p>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-6">
                     <a href="#productGrid" class="bg-white text-blue-600 font-bold py-2 px-5 rounded-lg hover:bg-gray-200 transition duration-300 text-sm">មើលផលិតផលទាំងអស់</a>
                     <div class="text-white text-sm">
-                        <p>ក្នុងស្តុក: <span id="inStockCount" class="font-bold">0</span></p>
-                        <p>អស់ពីស្តុក: <span id="soldOutCount" class="font-bold">0</span></p>
-                        <p>នាំចូលសរុប: <span id="totalImportCount" class="font-bold">0</span></p>
+                        <p>ចំនួន នាំចូល សរុប: <span id="inStockCount" class="font-bold">0</span></p>
+                        <p>ចំនួន លក់ចេញ សរុប: <span id="soldOutCount" class="font-bold">0</span></p>
+                        <p>ចំនួន នៅសល់ក្នុងស្តុកសរុប: <span id="totalImportCount" class="font-bold">0</span></p>
                     </div>
                 </div>
             </div>
@@ -440,7 +443,7 @@
                     <ul class="space-y-3 text-gray-300">
                         <li class="flex items-center space-x-3">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2.153a1 1 0 01-.986-.836l-.74-4.435a1 1 0 01.54-1.06l1.548-.773a11.037 11.037 0 00-6.105-6.105l-.774 1.548a1 1 0 01-1.06.54l-4.435-.74A1 1 0 012 4.153V3z" /></svg>
-                            <span id="footerPhone">097 244 4424 / 096 717 212</span>
+                            <span id="headerPhone">097 244 4424 / 096 717 212</span>
                         </li>
                         <li class="flex items-center space-x-3">
                              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
@@ -499,15 +502,18 @@
     <div id="adminModal" class="modal">
         <div class="modal-content max-w-4xl">
             <button id="closeAdminModal" class="modal-close-btn">&times;</button>
-            <h2 class="text-2xl font-koulen mb-6 text-center">ផ្ទាំងគ្រប់គ្រងផលិតផល</h2>
+            <h2 id="adminModalTitle" class="text-2xl font-koulen mb-6 text-center"></h2>
             
             <div class="bg-gray-50 p-6 rounded-lg shadow-inner mb-6">
-                <h3 id="formTitle" class="text-xl font-koulen mb-4">គ្រប់គ្រងផលិតផល</h3>
                 <form id="productForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="hidden" id="productId">
                     <div>
                         <label class="block text-gray-700">លេខកូដផលិតផល</label>
-                        <input type="text" id="productCode" class="w-full p-2 border rounded-lg bg-gray-200" readonly>
+                        <input type="text" id="productCode" class="w-full p-2 border rounded-lg bg-gray-200">
+                    </div>
+                     <div>
+                        <label class="block text-gray-700">កាលបរិច្ឆេទ</label>
+                        <input type="text" id="productDate" class="w-full p-2 border rounded-lg" required>
                     </div>
                     <div>
                         <label class="block text-gray-700">ឈ្មោះផលិតផល</label>
@@ -529,24 +535,20 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-gray-700">តម្លៃ ($)</label>
-                        <input type="number" id="productPrice" class="w-full p-2 border rounded-lg" required>
+                        <label class="block text-gray-700">តម្លៃយកចូល ($)</label>
+                        <input type="number" id="productImportPrice" step="0.01" class="w-full p-2 border rounded-lg" required>
                     </div>
-                     <div class="md:col-span-2">
-                        <label class="block text-gray-700">ចំនួននាំចូល</label>
+                    <div>
+                        <label class="block text-gray-700">តម្លៃលក់ចេញ ($)</label>
+                        <input type="number" id="productSellingPrice" step="0.01" class="w-full p-2 border rounded-lg" required>
+                    </div>
+                     <div>
+                        <label class="block text-gray-700">ចំនួនយកចូល</label>
                         <input type="number" id="productImportQty" class="w-full p-2 border rounded-lg" value="1" required>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-gray-700">ការពិពណ៌នា</label>
                         <textarea id="productDescription" rows="3" class="w-full p-2 border rounded-lg"></textarea>
-                    </div>
-                    
-                    <div class="md:col-span-2">
-                        <label class="block text-gray-700">ស្ថានភាព</label>
-                        <select id="productStatus" class="w-full p-2 border rounded-lg" required>
-                            <option value="inStock">មានក្នុងស្តុក</option>
-                            <option value="soldOut">អស់ពីស្តុក</option>
-                        </select>
                     </div>
 
                     <div class="md:col-span-2">
@@ -673,7 +675,7 @@
 
     <!-- Image Zoom Modal -->
     <div id="imageZoomModal" class="modal">
-        <span id="closeZoomModal" class="absolute top-5 right-8 text-white text-5xl font-bold cursor-pointer hover:text-gray-300">&times;</span>
+        <span id="closeZoomModal" class="modal-close-btn text-white hover:text-gray-300">&times;</span>
         <img class="m-auto max-w-[90%] max-h-[90%] rounded-lg" id="zoomedImage">
     </div>
 
@@ -681,7 +683,7 @@
     <div id="pageSetupModal" class="modal">
         <div class="modal-content">
             <button id="closePageSetupModal" class="modal-close-btn">&times;</button>
-            <h2 class="text-2xl font-koulen mb-6 text-center">កំណត់គេហទំព័រ</h2>
+            <h2 class="text-2xl font-koulen mb-6 text-center">កំណត់ค่าគេហទំព័រ</h2>
             <form id="pageSetupForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -751,6 +753,59 @@
             </form>
         </div>
     </div>
+    
+    <!-- Stock Management Modal -->
+    <div id="stockManagementModal" class="modal">
+        <div class="modal-content">
+            <button id="closeStockManagementModal" class="modal-close-btn">&times;</button>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-koulen">គ្រប់គ្រងស្តុកទំនិញ</h2>
+                <div class="flex items-center space-x-4">
+                    <input type="text" id="stockSearchInput" placeholder="ស្វែងរកតាមកូដ, ឈ្មោះ, កាលបរិច្ឆេទ..." class="p-2 border rounded-lg w-72">
+                    <div id="summaryDisplay" class="flex space-x-4">
+                         <div id="totalCostDisplay" class="text-lg font-bold text-blue-600"></div>
+                         <div id="totalProfitDisplay" class="text-lg font-bold text-green-600"></div>
+                    </div>
+                    <!-- Print Buttons -->
+                    <button id="printSummaryStockBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Print សរុប</span>
+                    </button>
+                    <button id="printDetailedStockBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex items-center space-x-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                            <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h12V6h-4a1 1 0 110-2h4a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                        </svg>
+                        <span>Print លំអិត</span>
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="stockTable" class="min-w-full bg-white">
+                    <thead class="bg-gray-800 text-white">
+                        <tr>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">ល.រ</th>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">ឈ្មោះ</th>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">បរិច្ឆេទ</th>
+                            <th class="text-right py-3 px-4 uppercase font-semibold text-sm">$ចូល</th>
+                            <th class="text-right py-3 px-4 uppercase font-semibold text-sm">$ចេញ</th>
+                            <th class="text-right py-3 px-4 uppercase font-semibold text-sm">$ចំណេញ</th>
+                            <th class="text-center py-3 px-4 uppercase font-semibold text-sm">#ចូល</th>
+                            <th class="text-center py-3 px-4 uppercase font-semibold text-sm">#ចេញ</th>
+                            <th class="text-center py-3 px-4 uppercase font-semibold text-sm">#សល់</th>
+                            <th class="text-center py-3 px-4 uppercase font-semibold text-sm">ស្តុក</th>
+                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">សកម្មភាព</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stockTableBody" class="text-gray-700">
+                        <!-- Stock items will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
 
     <!-- Notification Element -->
@@ -809,16 +864,18 @@
         const adminLoginBtn = document.getElementById('adminLoginBtn');
         const adminPanelBtn = document.getElementById('adminPanelBtn');
         const postAndSlideManageBtn = document.getElementById('postAndSlideManageBtn');
+        const stockManageBtn = document.getElementById('stockManageBtn');
         const adminLogoutBtn = document.getElementById('adminLogoutBtn');
         const resetAllViewsBtn = document.getElementById('resetAllViewsBtn');
         const pageSetupBtn = document.getElementById('pageSetupBtn');
         const mobileAdminMenuBtn = document.getElementById('mobileAdminMenuBtn');
         const mobileAdminDropdown = document.getElementById('mobileAdminDropdown');
-
+        
         // Modals
         const loginModal = document.getElementById('loginModal');
         const adminModal = document.getElementById('adminModal');
         const postAndSlideModal = document.getElementById('postAndSlideModal');
+        const stockManagementModal = document.getElementById('stockManagementModal');
         const productDetailModal = document.getElementById('productDetailModal');
         const postDetailModal = document.getElementById('postDetailModal');
         const imageZoomModal = document.getElementById('imageZoomModal');
@@ -837,7 +894,7 @@
         const newCategoryName = document.getElementById('newCategoryName');
         const existingCategories = document.getElementById('existingCategories');
         const deleteCategoryBtn = document.getElementById('deleteCategoryBtn');
-        const formTitle = document.getElementById('formTitle');
+        const adminModalTitle = document.getElementById('adminModalTitle');
         const cancelEditBtn = document.getElementById('cancelEditBtn');
         const resetViewBtn = document.getElementById('resetViewBtn');
         const imageInputsContainer = document.getElementById('imageInputsContainer');
@@ -848,6 +905,10 @@
         const postSubmitBtn = document.getElementById('postSubmitBtn');
         const saveSlideConfigBtn = document.getElementById('saveSlideConfigBtn');
         const featuredSections = document.getElementById('featured-sections');
+        const stockSearchInput = document.getElementById('stockSearchInput');
+        const printSummaryStockBtn = document.getElementById('printSummaryStockBtn');
+        const printDetailedStockBtn = document.getElementById('printDetailedStockBtn');
+
 
         // State Variables
         let allProducts = [];
@@ -865,6 +926,7 @@
         let slideInterval;
         let isSliding = false;
         let isInitialConfigLoaded = false;
+        let zIndexCounter = 1000;
 
         function showNotification(message, isError = false) {
             notification.textContent = message;
@@ -908,7 +970,6 @@
         // --- FIREBASE REFERENCES ---
         const productsRef = ref(db, 'products');
         const categoriesRef = ref(db, 'categories');
-        const metadataRef = ref(db, 'metadata');
         const postsRef = ref(db, 'posts');
         const slideshowConfigRef = ref(db, 'slideshowConfig');
         const siteConfigRef = ref(db, 'pageInfo');
@@ -927,18 +988,33 @@
             const data = snapshot.val();
             allProducts = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
             
-            const inStockCount = allProducts.filter(p => p.status === 'inStock' || !p.status).length;
-            const soldOutCount = allProducts.filter(p => p.status === 'soldOut').length;
-            const totalImportCount = allProducts.reduce((sum, p) => sum + (parseInt(p.importQty) || 0), 0);
+            // Calculations for the hero banner
+            let totalImportQty = 0;
+            let totalSoldQty = 0;
+            let totalRemainingStock = 0;
 
-            document.getElementById('inStockCount').textContent = inStockCount;
-            document.getElementById('soldOutCount').textContent = soldOutCount;
-            document.getElementById('totalImportCount').textContent = totalImportCount;
+            allProducts.forEach(p => {
+                const importQty = parseInt(p.importQty) || 0;
+                const currentStock = parseInt(p.currentStock) || 0;
+                // Ensure sold quantity is not negative if currentStock > importQty (e.g., after restock)
+                const soldQty = Math.max(0, importQty - currentStock);
+
+                totalImportQty += importQty;
+                totalSoldQty += soldQty;
+                totalRemainingStock += currentStock;
+            });
+
+            // Update the hero banner displays
+            document.getElementById('inStockCount').textContent = totalImportQty;
+            document.getElementById('soldOutCount').textContent = totalSoldQty;
+            document.getElementById('totalImportCount').textContent = totalRemainingStock;
+
 
             renderFeaturedSections();
             applyFilters();
             populateFilters();
             checkUrlForProduct();
+            renderStockTable();
         });
 
         onValue(categoriesRef, (snapshot) => {
@@ -1037,7 +1113,7 @@
                 if(product.status === 'soldOut') {
                     watermarkHTML = `<div class="sold-out-watermark-text">អស់ពីស្តុក</div>`;
                 } else if (sectionType === 'new') {
-                    watermarkHTML = `<div class="watermark new-arrival-watermark">ទើបមកដល់!</div>`;
+                    watermarkHTML = `<div class="watermark new-arrival-watermark">មកដល់ថ្មី!</div>`;
                 } else if (sectionType === 'popular' && product.id !== mostPopularId) { // Show star only if not the top popular
                     watermarkHTML = `<div class="watermark popular-watermark">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -1053,7 +1129,10 @@
                         ${watermarkHTML}
                     </div>
                     <div class="p-4 flex flex-col flex-grow">
-                        <p class="text-xs text-gray-400 font-mono">${product.productCode || ''}</p>
+                        <div class="flex justify-between items-baseline">
+                            <p class="text-xs text-gray-400 font-mono">${product.productCode || ''}</p>
+                            <p class="text-xs text-gray-400">${product.displayDate ? product.displayDate.split('/')[0] + '/' + product.displayDate.split('/')[1] + '/' + product.displayDate.split('/')[2].slice(-2) : ''}</p>
+                        </div>
                         <h3 class="text-lg font-bold text-gray-800 truncate">${product.name}</h3>
                         <p class="text-sm text-gray-500">${product.brand}</p>
                         <div class="flex justify-between items-center mt-2">
@@ -1068,8 +1147,8 @@
                         </div>
                         <div class="flex-grow"></div>
                         <div class="flex justify-between items-center mt-4">
-                            <p class="text-xl font-koulen text-red-600">$${product.price ? parseFloat(product.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}</p>
-                            <span class="text-xs font-bold ${product.status === 'soldOut' ? 'text-red-500' : 'text-green-500'}">${product.status === 'soldOut' ? 'អស់ស្តុក' : 'មានស្តុក'}</span>
+                            <p class="text-xl font-koulen text-red-600">$${product.sellingPrice ? parseFloat(product.sellingPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}</p>
+                            <span class="text-xs font-bold ${product.status === 'soldOut' ? 'text-red-500' : 'text-green-500'}">${product.status === 'soldOut' ? 'អស់ពីស្តុក' : 'មានក្នុងស្តុក'}</span>
                         </div>
                          ${(currentUser && !currentUser.isAnonymous) ? `
                             <div class="flex space-x-2 mt-2 self-end">
@@ -1108,7 +1187,7 @@
             }
             if (price) {
                 filtered = filtered.filter(p => {
-                    const productPrice = parseFloat(p.price);
+                    const productPrice = parseFloat(p.sellingPrice);
                     if (isNaN(productPrice)) return false; 
                     if (price === '<100' && productPrice >= 100) return false;
                     if (price === '100-300' && (productPrice < 100 || productPrice > 300)) return false;
@@ -1239,31 +1318,46 @@
 
         // --- MODAL HANDLING ---
         function openModal(modal) {
+            zIndexCounter++;
+            modal.style.zIndex = zIndexCounter;
             modal.style.display = 'flex';
             document.body.classList.add('modal-open');
         }
 
         function closeModal(modal) {
             modal.style.display = 'none';
-            document.body.classList.remove('modal-open');
+            const anyModalOpen = document.querySelector('.modal[style*="display: flex"]');
+            if (!anyModalOpen) {
+                document.body.classList.remove('modal-open');
+            }
         }
+        
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+        });
+
+        document.querySelectorAll('.modal-close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal');
+                if(modal) closeModal(modal);
+            });
+        });
 
         adminLoginBtn.addEventListener('click', () => openModal(loginModal));
-        document.getElementById('closeLoginModal').addEventListener('click', () => closeModal(loginModal));
         
         adminPanelBtn.addEventListener('click', () => {
             prepareNewProductForm();
             openModal(adminModal);
         });
-        document.getElementById('closeAdminModal').addEventListener('click', () => closeModal(adminModal));
         
         postAndSlideManageBtn.addEventListener('click', () => openModal(postAndSlideModal));
-        document.getElementById('closePostAndSlideModal').addEventListener('click', () => closeModal(postAndSlideModal));
         
-        document.getElementById('closeDetailModal').addEventListener('click', () => closeModal(productDetailModal));
-        document.getElementById('closePostDetailModal').addEventListener('click', () => closeModal(postDetailModal));
-        document.getElementById('closeZoomModal').addEventListener('click', () => closeModal(imageZoomModal));
-        
+        stockManageBtn.addEventListener('click', () => openModal(stockManagementModal));
+
         pageSetupBtn.addEventListener('click', () => {
             loadConfigToForm();
             openModal(pageSetupModal);
@@ -1271,8 +1365,6 @@
                 document.getElementById('siteName').focus();
             }, 50);
         });
-        
-        document.getElementById('closePageSetupModal').addEventListener('click', () => closeModal(pageSetupModal));
 
         function handleProductClick(e) {
             if (e.target.closest('.edit-btn') || e.target.closest('.delete-btn')) { return; }
@@ -1300,7 +1392,7 @@
             document.getElementById('detailName').textContent = product.name;
             document.getElementById('detailCode').innerHTML = `លេខកូដផលិតផល: <span class="text-red-500 font-bold text-base">${product.productCode || 'N/A'}</span>`;
             document.getElementById('detailBrand').textContent = product.brand;
-            document.getElementById('detailPrice').textContent = `$${product.price ? parseFloat(product.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}`;
+            document.getElementById('detailPrice').textContent = `$${product.sellingPrice ? parseFloat(product.sellingPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}`;
             document.getElementById('detailCategory').textContent = product.category;
             document.getElementById('detailDescription').textContent = product.description;
 
@@ -1450,16 +1542,17 @@
                 return;
             }
             
+            const importQty = parseInt(document.getElementById('productImportQty').value) || 0;
             const productData = {
                 productCode: document.getElementById('productCode').value,
                 name: document.getElementById('productName').value,
                 brand: document.getElementById('productBrand').value,
                 category: document.getElementById('productCategory').value,
-                price: parseFloat(document.getElementById('productPrice').value),
+                importPrice: parseFloat(document.getElementById('productImportPrice').value) || 0,
+                sellingPrice: parseFloat(document.getElementById('productSellingPrice').value) || 0,
                 quality: document.getElementById('productQuality').value,
-                importQty: parseInt(document.getElementById('productImportQty').value) || 0,
+                displayDate: document.getElementById('productDate').value,
                 description: document.getElementById('productDescription').value,
-                status: document.getElementById('productStatus').value,
                 imageUrls: imageUrls
             };
 
@@ -1467,20 +1560,23 @@
                 if (editingProductId) {
                     const currentProduct = allProducts.find(p => p.id === editingProductId);
                     productData.views = currentProduct.views || 0;
+                    productData.importQty = currentProduct.importQty; // Keep old import qty
+                    productData.currentStock = currentProduct.currentStock; // Keep old current stock
+                    productData.status = productData.currentStock > 0 ? 'inStock' : 'soldOut';
+                    productData.createdAt = currentProduct.createdAt; // Keep original creation timestamp
+
                     await update(ref(db, `products/${editingProductId}`), productData);
                     showNotification('កែប្រែផលិតផលបានជោគជ័យ!');
                 } else {
-                    const counterRef = ref(db, 'metadata/lastProductCode');
-                    const result = await runTransaction(counterRef, (currentValue) => (currentValue || 0) + 1);
-                    if (result.committed) {
-                        const nextId = result.snapshot.val();
-                        productData.productCode = `JTC-${String(nextId).padStart(4, '0')}`;
-                        productData.views = 0;
-                        await set(push(productsRef), productData);
-                        showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
-                    } else {
-                        throw new Error("Failed to generate product code.");
-                    }
+                    const newProductCode = await generateNextProductCode();
+                    productData.productCode = newProductCode;
+                    productData.views = 0;
+                    productData.importQty = importQty;
+                    productData.currentStock = importQty;
+                    productData.status = importQty > 0 ? 'inStock' : 'soldOut';
+                    productData.createdAt = serverTimestamp();
+                    await set(push(productsRef), productData);
+                    showNotification('បន្ថែមផលិតផលបានជោគជ័យ!');
                 }
                 resetProductForm();
                 closeModal(adminModal);
@@ -1503,33 +1599,59 @@
                 }
             }
         });
+        
+        async function generateNextProductCode() {
+            const existingCodes = allProducts.map(p => parseInt((p.productCode || 'JTC-0').split('-')[1] || 0));
+            existingCodes.sort((a,b) => a-b);
+            
+            let nextId = 1;
+            for(const id of existingCodes) {
+                if (id === nextId) {
+                    nextId++;
+                } else {
+                    break;
+                }
+            }
+            return `JTC-${nextId}`;
+        }
 
         async function prepareNewProductForm() {
             resetProductForm();
-            onValue(ref(db, 'metadata/lastProductCode'), (snapshot) => {
-                const lastId = snapshot.val() || 0;
-                const nextId = lastId + 1;
-                document.getElementById('productCode').value = `JTC-${String(nextId).padStart(4, '0')}`;
-                setTimeout(() => document.getElementById('productName').focus(), 50);
-            }, { onlyOnce: true });
+            const nextCode = await generateNextProductCode();
+            document.getElementById('productCode').value = nextCode;
+            
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = String(now.getFullYear()).slice(-2);
+            document.getElementById('productDate').value = `${day}/${month}/${year}`;
+
+            setTimeout(() => document.getElementById('productName').focus(), 50);
         }
 
         function handleEditProduct(e) {
             e.stopPropagation();
-            const id = e.target.closest('button').dataset.id;
+            const id = e.target.dataset.id;
             const product = allProducts.find(p => p.id === id);
             if (product) {
                 resetProductForm();
                 editingProductId = id; 
                 document.getElementById('productCode').value = product.productCode || 'N/A';
+                document.getElementById('productCode').readOnly = false;
+                document.getElementById('productCode').classList.remove('bg-gray-200');
+
+                document.getElementById('productDate').value = product.displayDate || new Date(product.createdAt).toLocaleDateString('en-GB');
                 document.getElementById('productName').value = product.name;
                 document.getElementById('productBrand').value = product.brand;
                 document.getElementById('productCategory').value = product.category;
-                document.getElementById('productPrice').value = product.price;
+                document.getElementById('productImportPrice').value = product.importPrice;
+                document.getElementById('productSellingPrice').value = product.sellingPrice;
                 document.getElementById('productQuality').value = product.quality || 'មួយទឹក';
-                document.getElementById('productImportQty').value = product.importQty || 1;
+                document.getElementById('productImportQty').value = product.importQty || 0;
+                document.getElementById('productImportQty').readOnly = true; // Lock this field
+                document.getElementById('productImportQty').classList.add('bg-gray-200');
+
                 document.getElementById('productDescription').value = product.description;
-                document.getElementById('productStatus').value = product.status || 'inStock';
                 
                 imageInputsContainer.innerHTML = ''; 
                 if (Array.isArray(product.imageUrls)) {
@@ -1538,7 +1660,7 @@
                     addImageInput(); 
                 }
 
-                formTitle.textContent = 'កែប្រែផលិតផល';
+                adminModalTitle.textContent = 'កែប្រែផលិតផល';
                 cancelEditBtn.classList.remove('hidden');
                 resetViewBtn.classList.remove('hidden');
                 openModal(adminModal);
@@ -1576,10 +1698,13 @@
             imageInputsContainer.innerHTML = '';
             addImageInput();
             editingProductId = null;
-            formTitle.textContent = 'បន្ថែមផលិតផលថ្មី';
+            adminModalTitle.textContent = 'បន្ថែមផលិតផល';
             cancelEditBtn.classList.remove('hidden');
             resetViewBtn.classList.add('hidden');
-            document.getElementById('productCode').value = 'កំពុងបង្កើត...';
+            document.getElementById('productCode').readOnly = true;
+            document.getElementById('productCode').classList.add('bg-gray-200');
+            document.getElementById('productImportQty').readOnly = false;
+            document.getElementById('productImportQty').classList.remove('bg-gray-200');
         }
 
         cancelEditBtn.addEventListener('click', () => closeModal(adminModal));
@@ -1620,7 +1745,7 @@
             const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
             const shareData = {
                 title: product.name,
-                text: `${product.name} - តម្លៃ $${product.price} នៅ J-Tech Cambodia`,
+                text: `${product.name} - តម្លៃ $${product.sellingPrice} នៅ J-Tech Cambodia`,
                 url: shareUrl,
             };
 
@@ -1940,9 +2065,10 @@
             mobileAdminDropdown.innerHTML = '';
             if (isAdmin) {
                 const links = [
-                    { text: 'គ្រប់គ្រងផលិតផល', action: () => openModal(adminModal) },
+                    { text: 'បន្ថែមផលិតផល', action: () => openModal(adminModal) },
+                    { text: 'គ្រប់គ្រងស្តុក', action: () => openModal(stockManagementModal) },
                     { text: 'គ្រប់គ្រង Post & ស្លាយ', action: () => openModal(postAndSlideModal) },
-                    { text: 'កំណត់គេហទំព័រ', action: () => openModal(pageSetupModal) },
+                    { text: 'Page Setup', action: () => openModal(pageSetupModal) },
                     { text: 'Reset Views', action: () => resetAllViewsBtn.click() },
                     { text: 'ចាកចេញ', action: () => adminLogoutBtn.click() }
                 ];
@@ -1971,6 +2097,346 @@
                 mobileAdminDropdown.classList.add('hidden');
             }
         });
+
+        // --- STOCK MANAGEMENT ---
+        function renderStockTable(filteredProducts = null) {
+            const tableBody = document.getElementById('stockTableBody');
+            if(!tableBody) return; // Exit if on the wrong page
+            let totalProfit = 0;
+            let totalImportCost = 0; // New variable
+            tableBody.innerHTML = '';
+            
+            const productsToRender = (filteredProducts || [...allProducts]).sort((a, b) => {
+                const codeA = parseInt((a.productCode || 'JTC-0').split('-')[1] || 0);
+                const codeB = parseInt((b.productCode || 'JTC-0').split('-')[1] || 0);
+                return codeB - codeA;
+            });
+
+            productsToRender.forEach(p => {
+                const importQty = p.importQty || 0;
+                const currentStock = p.currentStock || 0;
+                const soldQty = importQty - currentStock;
+                const profit = soldQty * ((p.sellingPrice || 0) - (p.importPrice || 0));
+                totalProfit += profit;
+                totalImportCost += (p.importPrice || 0) * importQty;
+
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-100';
+                row.innerHTML = `
+                    <td class="py-3 px-4 whitespace-nowrap">${p.productCode || 'N/A'}</td>
+                    <td class="py-3 px-4">${p.name}</td>
+                    <td class="py-3 px-4 whitespace-nowrap">${p.displayDate || new Date(p.createdAt).toLocaleDateString('en-GB')}</td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">$${(p.importPrice || 0).toFixed(2)}</td>
+                    <td class="py-3 px-4 text-right whitespace-nowrap">$${(p.sellingPrice || 0).toFixed(2)}</td>
+                    <td class="py-3 px-4 text-right font-bold ${profit > 0 ? 'text-green-600' : 'text-red-600'} whitespace-nowrap">$${profit.toFixed(2)}</td>
+                    <td class="py-3 px-4 text-center">${importQty}</td>
+                    <td class="py-3 px-4 text-center">${soldQty}</td>
+                    <td class="py-3 px-4 text-center font-bold">${currentStock}</td>
+                    <td class="py-3 px-4 text-center"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${p.status === 'inStock' || !p.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${p.status === 'inStock' || !p.status ? 'InStk' : 'OutStk'}</span></td>
+                    <td class="py-3 px-4 whitespace-nowrap">
+                        <button data-id="${p.id}" class="sell-btn bg-blue-500 text-white px-2 py-1 text-xs rounded">លក់ចេញ</button>
+                        <button data-id="${p.id}" class="restock-btn bg-green-500 text-white px-2 py-1 text-xs rounded ml-1">បញ្ចូលស្តុក</button>
+                        <button data-id="${p.id}" class="edit-stock-btn bg-yellow-500 text-white px-2 py-1 text-xs rounded ml-1">កែប្រែ</button>
+                        <button data-id="${p.id}" class="delete-stock-btn bg-red-500 text-white px-2 py-1 text-xs rounded ml-1">លុប</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            document.getElementById('totalCostDisplay').textContent = `ប្រាក់ថ្លៃដើមសរុប: $${totalImportCost.toFixed(2)}`;
+            document.getElementById('totalProfitDisplay').textContent = `ប្រាក់ចំណេញសរុប: $${totalProfit.toFixed(2)}`;
+
+            tableBody.querySelectorAll('.sell-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => handleSellProduct(e.target.dataset.id));
+            });
+             tableBody.querySelectorAll('.restock-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => handleRestockProduct(e.target.dataset.id));
+            });
+            tableBody.querySelectorAll('.edit-stock-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => handleEditProduct(e));
+            });
+            tableBody.querySelectorAll('.delete-stock-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => handleDeleteProduct(e));
+            });
+        }
+        
+        if (stockSearchInput) {
+            stockSearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                if (!searchTerm) {
+                    renderStockTable();
+                    return;
+                }
+                const filtered = allProducts.filter(p => 
+                    (p.productCode && p.productCode.toLowerCase().includes(searchTerm)) ||
+                    (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                    (p.displayDate && p.displayDate.includes(searchTerm))
+                );
+                renderStockTable(filtered);
+            });
+        }
+        
+        async function handleSellProduct(productId) {
+            const sellQty = parseInt(prompt("សូមបញ្ចូលចំនួនដែលលក់ចេញ:", "1"));
+            if (isNaN(sellQty) || sellQty <= 0) {
+                showNotification("សូមបញ្ចូលចំនួនជាលេខវិជ្ជមាន។", true);
+                return;
+            }
+
+            const productRef = ref(db, `products/${productId}`);
+            try {
+                await runTransaction(productRef, (product) => {
+                    if (product) {
+                        if (product.currentStock >= sellQty) {
+                            product.currentStock -= sellQty;
+                            if (product.currentStock <= 0) {
+                                product.status = 'soldOut';
+                            }
+                        } else {
+                            // IMPORTANT: Using custom notification instead of alert
+                            showNotification(`មិនអាចលក់បានទេ! ស្តុកនៅសល់តែ ${product.currentStock} ប៉ុណ្ណោះ។`, true);
+                            return; // Abort transaction
+                        }
+                    }
+                    return product;
+                });
+                showNotification('បានដកចេញពីស្តុកเรียบร้อย!');
+            } catch (error) {
+                showNotification('មានបញ្ហាក្នុងការដកចេញពីស្តុក។', true);
+                console.error("Sell transaction failed: ", error);
+            }
+        }
+
+        async function handleRestockProduct(productId) {
+            const restockQty = parseInt(prompt("សូមបញ្ចូលចំនួនស្តុកដែលយកចូលបន្ថែម:", "1"));
+            if (isNaN(restockQty) || restockQty <= 0) {
+                showNotification("សូមបញ្ចូលចំនួនជាលេខវិជ្ជមាន។", true);
+                return;
+            }
+
+            const productRef = ref(db, `products/${productId}`);
+            try {
+                await runTransaction(productRef, (product) => {
+                    if (product) {
+                        product.importQty = (product.importQty || 0) + restockQty;
+                        product.currentStock = (product.currentStock || 0) + restockQty;
+                        product.status = 'inStock';
+                    }
+                    return product;
+                });
+                showNotification('បានបញ្ចូលស្តុកបន្ថែមเรียบร้อย!');
+            } catch (error) {
+                showNotification('មានបញ្ហាក្នុងការបញ្ចូលស្តុក។', true);
+                console.error("Restock transaction failed: ", error);
+            }
+        }
+        
+        function getProductsToPrint() {
+            const searchTerm = stockSearchInput.value.toLowerCase().trim();
+            let products;
+            if (searchTerm) {
+                 products = allProducts.filter(p => 
+                    (p.productCode && p.productCode.toLowerCase().includes(searchTerm)) ||
+                    (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                    (p.displayDate && p.displayDate.includes(searchTerm))
+                );
+            } else {
+                products = [...allProducts];
+            }
+            // Sort by product code ascending
+            return products.sort((a, b) => {
+                const codeA = parseInt((a.productCode || 'JTC-0').split('-')[1] || 0);
+                const codeB = parseInt((b.productCode || 'JTC-0').split('-')[1] || 0);
+                return codeA - codeB; 
+            });
+        }
+
+        function printPdf(element, filename, orientation = 'portrait') {
+            const opt = {
+                margin:       0.5,
+                filename:     filename,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: orientation }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        if (printSummaryStockBtn) {
+            printSummaryStockBtn.addEventListener('click', () => {
+                const productsToPrint = getProductsToPrint();
+                let tableHtml = `
+                    <thead style="background-color: #333; color: white;">
+                        <tr>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ល.រ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ឈ្មោះ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">បរិច្ឆេទ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">$ចូល</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">$ចេញ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">$ចំណេញ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">#ចូល</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">#ចេញ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">#សល់</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ស្តុក</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                let totalImportPriceValue = 0;
+                let totalSellPriceValue = 0;
+                let totalImportQty = 0;
+                let totalSoldQty = 0;
+                let totalRemainingStock = 0;
+                let totalProfitValue = 0;
+
+                productsToPrint.forEach(p => {
+                    const importQty = p.importQty || 0;
+                    const currentStock = p.currentStock || 0;
+                    const soldQty = importQty - currentStock;
+                    const profit = soldQty * ((p.sellingPrice || 0) - (p.importPrice || 0));
+                    
+                    totalImportPriceValue += (p.importPrice || 0) * importQty;
+                    totalSellPriceValue += (p.sellingPrice || 0) * soldQty;
+                    totalImportQty += importQty;
+                    totalSoldQty += soldQty;
+                    totalRemainingStock += currentStock;
+                    totalProfitValue += profit;
+
+                    tableHtml += `
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.productCode || 'N/A'}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.name || ''}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.displayDate || ''}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${(p.importPrice || 0).toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${(p.sellingPrice || 0).toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${profit.toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${importQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${soldQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${currentStock}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${p.status === 'inStock' || !p.status ? 'InStk' : 'OutStk'}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHtml += `
+                    </tbody>
+                    <tfoot style="font-weight: bold;">
+                        <tr>
+                            <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;">សរុបរួម</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${totalImportPriceValue.toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${totalSellPriceValue.toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${totalProfitValue.toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${totalImportQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${totalSoldQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${totalRemainingStock}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;"></td>
+                        </tr>
+                    </tfoot>
+                `;
+
+                const printableElement = document.createElement('div');
+                printableElement.innerHTML = `
+                    <div style="font-family: 'Koulen', cursive; text-align: center; font-size: 24px; margin-bottom: 1rem;">របាយការណ៍សរុបស្តុកទំនិញ</div>
+                    <div style="font-family: 'Noto Sans Khmer', sans-serif; margin-bottom: 1rem;">
+                        <div>${document.getElementById('totalCostDisplay').textContent}</div>
+                        <div>${document.getElementById('totalProfitDisplay').textContent}</div>
+                    </div>
+                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; font-family: 'Noto Sans Khmer', sans-serif;">${tableHtml}</table>
+                `;
+                
+                printPdf(printableElement, 'jtech-summary-stock-report.pdf', 'landscape');
+            });
+        }
+
+        if (printDetailedStockBtn) {
+            printDetailedStockBtn.addEventListener('click', () => {
+                const productsToPrint = getProductsToPrint();
+                let tableHtml = `
+                    <thead style="background-color: #333; color: white;">
+                        <tr>
+                            <th style="padding: 8px; border: 1px solid #ddd;">កូដ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ឈ្មោះទំនិញ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ម៉ាក</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ប្រភេទ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">បរិច្ឆេទ</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">$ចូល</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">$លក់</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ច.ចូល</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ច.លក់</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ច.សល់</th>
+                            <th style="padding: 8px; border: 1px solid #ddd;">ចំណេញសរុប</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                `;
+                
+                let totalImportPriceValue = 0;
+                let totalSellPriceValue = 0;
+                let totalImportQty = 0;
+                let totalSoldQty = 0;
+                let totalRemainingStock = 0;
+                let totalProfitValue = 0;
+
+                productsToPrint.forEach(p => {
+                    const importQty = p.importQty || 0;
+                    const currentStock = p.currentStock || 0;
+                    const soldQty = importQty - currentStock;
+                    const profit = soldQty * ((p.sellingPrice || 0) - (p.importPrice || 0));
+                    
+                    totalImportPriceValue += (p.importPrice || 0) * importQty;
+                    totalSellPriceValue += (p.sellingPrice || 0) * soldQty;
+                    totalImportQty += importQty;
+                    totalSoldQty += soldQty;
+                    totalRemainingStock += currentStock;
+                    totalProfitValue += profit;
+
+                    tableHtml += `
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.productCode || 'N/A'}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.name || ''}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.brand || ''}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.category || ''}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${p.displayDate || ''}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${(p.importPrice || 0).toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${(p.sellingPrice || 0).toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${importQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${soldQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${currentStock}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${profit.toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                tableHtml += `
+                    </tbody>
+                    <tfoot style="font-weight: bold;">
+                        <tr>
+                            <td colspan="5" style="padding: 8px; border: 1px solid #ddd; text-align: right;">សរុបរួម</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${totalImportPriceValue.toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${totalSellPriceValue.toFixed(2)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${totalImportQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${totalSoldQty}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${totalRemainingStock}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">$${totalProfitValue.toFixed(2)}</td>
+                        </tr>
+                    </tfoot>
+                `;
+
+                const printableElement = document.createElement('div');
+                printableElement.innerHTML = `
+                    <div style="font-family: 'Koulen', cursive; text-align: center; font-size: 24px; margin-bottom: 1rem;">របាយការណ៍ស្តុកទំនិញលំអិត</div>
+                     <div style="font-family: 'Noto Sans Khmer', sans-serif; margin-bottom: 1rem; display: flex; justify-content: space-between;">
+                        <span>ឈ្មោះហាង: ${siteConfig.siteName || 'J-TECH CAMBODIA'}</span>
+                        <span>កាលបរិច្ឆេទបោះពុម្ព: ${new Date().toLocaleDateString('km-KH')}</span>
+                    </div>
+                    <table style="width: 100%; font-size: 12px; border-collapse: collapse; font-family: 'Noto Sans Khmer', sans-serif;">${tableHtml}</table>
+                `;
+                
+                printPdf(printableElement, 'jtech-detailed-stock-report.pdf', 'landscape');
+            });
+        }
+
 
         // --- INITIALIZATION ---
         async function main() {
